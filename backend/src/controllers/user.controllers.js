@@ -284,6 +284,17 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while uploading on avatar ");
   }
 
+  if (req.user?.avatar) {
+    try {
+      await deleteImageFromCloudinary(req.user.avatar);
+    } catch (error) {
+      console.error(
+        "Error deleting old avatar from Cloudinary:",
+        error.message
+      );
+    }
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user?._id,
 
@@ -312,6 +323,18 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   if (!coverImage.url) {
     throw new ApiError(400, "Error while uploading on coverImage ");
   }
+
+  if (req.user?.coverImage) {
+    try {
+      await deleteImageFromCloudinary(req.user.coverImage);
+    } catch (error) {
+      console.error(
+        "Error deleting old avatar from Cloudinary:",
+        error.message
+      );
+    }
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user?._id,
 
@@ -330,7 +353,76 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Cover Image updated succesfully"));
 });
 
-// Todo make a function to delete image
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim()) throw new ApiError(400, "username is missing");
+
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username?.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "Subscription",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "Subscription",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: {
+          $size: "$subscribers",
+        },
+        channelsSubscribedToCount: {
+          $size: "$subscribedTo",
+        },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscriber.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullName: 1,
+        username: 1,
+        subscribersCount: 1,
+        channelsSubscribedToCount: 1,
+        isSubscribed: 1,
+        avatar: 1,
+        coverImage: 1,
+        email: 1,
+      },
+    },
+  ]);
+
+  if (!channel?.length) {
+    throw new ApiError(400, "Channel doesn't exist");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, channel[0], "User channel fetched successfully")
+    );
+});
+
+// Todo make a function to delete image - done
 export {
   registerUser,
   loginUser,
@@ -341,4 +433,5 @@ export {
   updateAccountDetails,
   updateUserAvatar,
   updateUserCoverImage,
+  getUserChannelProfile,
 };

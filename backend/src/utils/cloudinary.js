@@ -26,6 +26,29 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
+const deleteImageFromCloudinary = async (imageUrl) => {
+  try {
+    const publicId = extractPublicIdFromUrl(imageUrl);
+
+    const result = await cloudinary.api.delete_resources([publicId], {
+      type: "upload",
+      resource_type: "image",
+    });
+
+    console.log(result);
+
+    console.log(`Image with public_id ${publicId} deleted successfully.`);
+  } catch (error) {
+    console.error("Error deleting image from Cloudinary:", error.message);
+  }
+};
+function extractPublicIdFromUrl(imageUrl) {
+  const parts = imageUrl.split("/");
+  const filename = parts[parts.length - 1];
+  const publicId = filename.split(".")[0];
+  return publicId;
+}
+
 // cloudinary.uploader.upload(
 //   "https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg",
 //   { public_id: "olympic_flag" },
@@ -34,4 +57,4 @@ const uploadOnCloudinary = async (localFilePath) => {
 //   }
 // );
 
-export { uploadOnCloudinary };
+export { uploadOnCloudinary, deleteImageFromCloudinary };
