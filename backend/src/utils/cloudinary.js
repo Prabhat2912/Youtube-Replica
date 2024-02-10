@@ -17,11 +17,32 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
+      quality_analysis: true,
     });
     fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
     fs.unlinkSync(localFilePath); //remove the locally saved file as the upload operation failed
+    return null;
+  }
+};
+
+const videoDuration = async (videoUrl) => {
+  try {
+    const publicId = extractPublicIdFromUrl(videoUrl);
+
+    const result = await cloudinary.api.resource(publicId, {
+      quality_analysis: true,
+    });
+
+    const duration = result.quality_analysis.video.duration;
+    console.log("Video duration:", duration);
+    return duration;
+  } catch (error) {
+    console.error(
+      "Error getting video duration from Cloudinary:",
+      error.message
+    );
     return null;
   }
 };
@@ -42,6 +63,24 @@ const deleteImageFromCloudinary = async (imageUrl) => {
     console.error("Error deleting image from Cloudinary:", error.message);
   }
 };
+
+const deleteVideoFromCloudinary = async (videoUrl) => {
+  try {
+    const publicId = extractPublicIdFromUrl(videoUrl);
+
+    const result = await cloudinary.api.delete_resources([publicId], {
+      type: "upload",
+      resource_type: "video",
+    });
+
+    console.log(result);
+
+    console.log(`Image with public_id ${publicId} deleted successfully.`);
+  } catch (error) {
+    console.error("Error deleting video from Cloudinary:", error.message);
+  }
+};
+
 function extractPublicIdFromUrl(imageUrl) {
   const parts = imageUrl.split("/");
   const filename = parts[parts.length - 1];
@@ -57,4 +96,9 @@ function extractPublicIdFromUrl(imageUrl) {
 //   }
 // );
 
-export { uploadOnCloudinary, deleteImageFromCloudinary };
+export {
+  uploadOnCloudinary,
+  deleteImageFromCloudinary,
+  videoDuration,
+  deleteVideoFromCloudinary,
+};
