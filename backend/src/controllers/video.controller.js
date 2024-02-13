@@ -11,7 +11,7 @@ import {
 } from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { query, sortBy, sortType, userId } = req.query;
+  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
 
   const queryOptions = {};
 
@@ -23,14 +23,17 @@ const getAllVideos = asyncHandler(async (req, res) => {
     queryOptions.owner = userId;
   }
 
-  let videos;
-
+  const sortOptions = {};
   if (sortBy && sortType) {
-    const sortOptions = { [sortBy]: sortType === "desc" ? -1 : 1 };
-    videos = await Video.find(queryOptions).sort(sortOptions);
-  } else {
-    videos = await Video.find(queryOptions);
+    sortOptions[sortBy] = sortType === "desc" ? -1 : 1;
   }
+
+  const skip = (page - 1) * limit;
+
+  const videos = await Video.find(queryOptions)
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(parseInt(limit));
 
   return res
     .status(200)
