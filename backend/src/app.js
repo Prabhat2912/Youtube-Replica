@@ -4,6 +4,10 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+var bodyParser = require("body-parser");
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
