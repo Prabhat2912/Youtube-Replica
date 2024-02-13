@@ -23,6 +23,10 @@ import userRouter from "./routes/user.routes.js";
 
 //routes declaration
 
+app.use("/", (req, res) => {
+  res.send("Server is running");
+});
+
 app.use("/api/v1/users", userRouter);
 
 export { app };
