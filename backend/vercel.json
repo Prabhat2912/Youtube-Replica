@@ -4,7 +4,7 @@
   "routes": [{ "src": "/(.*)", "dest": "/" }],
   "functions": {
     "api/*": {
-      "maxBodySize": "500mb"
+      "maxBodySize": "100mb"
     }
   }
 }
