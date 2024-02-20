@@ -39,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //check for user creation
   //return response
 
-  const { fullName, email, username, password } = req.body;
+  const { fullName, email, username, password, avatar, coverImage } = req.body;
 
   console.log("email: ", email);
 
@@ -56,27 +56,27 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with username or email already exists");
   }
 
-  const avtarLocalPath = req.files?.avatar[0]?.path;
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
 
   //   console.log(req.files);
 
   //   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-  let coverImageLocalPath;
-  if (
-    req.files &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
-  ) {
-    coverImageLocalPath = req.files.coverImage[0].path;
-  }
+  // let coverImageLocalPath;
+  // if (
+  //   req.files &&
+  //   Array.isArray(req.files.coverImage) &&
+  //   req.files.coverImage.length > 0
+  // ) {
+  //   coverImageLocalPath = req.files.coverImage[0].path;
+  // }
 
-  if (!avtarLocalPath) {
-    throw new ApiError(400, "Avatar File is required");
-  }
+  // if (!avtarLocalPath) {
+  //   throw new ApiError(400, "Avatar File is required");
+  // }
 
-  const avatar = await uploadOnCloudinary(avtarLocalPath);
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  // const avatar = await uploadOnCloudinary(avtarLocalPath);
+  // const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!avatar) {
     throw new ApiError(400, "Avatar File is required");
@@ -84,8 +84,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const user = await User.create({
     fullName,
-    avatar: avatar.url,
-    coverImage: coverImage?.url || "",
+    avatar: avatar,
+    coverImage: coverImage || "",
     email,
     password,
     username: username.toLowerCase(),
@@ -279,36 +279,36 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-  const avatarLocalPath = req.file?.path;
-  if (!avatarLocalPath) {
+  const avatar = req.body;
+  if (!avatar) {
     throw new ApiError(400, "Avatar file is missing");
   }
 
-  console.log(avatarLocalPath);
+  console.log(avatar);
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  // const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-  if (!avatar.url) {
-    throw new ApiError(400, "Error while uploading on avatar ");
-  }
+  // if (!avatar.url) {
+  //   throw new ApiError(400, "Error while uploading on avatar ");
+  // }
 
-  if (req.user?.avatar) {
-    try {
-      await deleteImageFromCloudinary(req.user.avatar);
-    } catch (error) {
-      console.error(
-        "Error deleting old avatar from Cloudinary:",
-        error.message
-      );
-    }
-  }
+  // if (req.user?.avatar) {
+  //   try {
+  //     await deleteImageFromCloudinary(req.user.avatar);
+  //   } catch (error) {
+  //     console.error(
+  //       "Error deleting old avatar from Cloudinary:",
+  //       error.message
+  //     );
+  //   }
+  // }
 
   const user = await User.findByIdAndUpdate(
     req.user?._id,
 
     {
       $set: {
-        avatar: avatar.url,
+        avatar: avatar,
       },
     },
     {
@@ -321,34 +321,34 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Avatar updated succesfully"));
 });
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-  const coverImageLocalPath = req.file?.path;
-  if (!coverImageLocalPath) {
+  const coverImage = req.body;
+  if (!coverImage) {
     throw new ApiError(400, "CoverImage file is missing");
   }
 
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  // const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-  if (!coverImage.url) {
-    throw new ApiError(400, "Error while uploading on coverImage ");
-  }
+  // if (!coverImage.url) {
+  //   throw new ApiError(400, "Error while uploading on coverImage ");
+  // }
 
-  if (req.user?.coverImage) {
-    try {
-      await deleteImageFromCloudinary(req.user.coverImage);
-    } catch (error) {
-      console.error(
-        "Error deleting old avatar from Cloudinary:",
-        error.message
-      );
-    }
-  }
+  // if (req.user?.coverImage) {
+  //   try {
+  //     await deleteImageFromCloudinary(req.user.coverImage);
+  //   } catch (error) {
+  //     console.error(
+  //       "Error deleting old avatar from Cloudinary:",
+  //       error.message
+  //     );
+  //   }
+  // }
 
   const user = await User.findByIdAndUpdate(
     req.user?._id,
 
     {
       $set: {
-        coverImage: coverImage.url,
+        coverImage: coverImage,
       },
     },
     {
