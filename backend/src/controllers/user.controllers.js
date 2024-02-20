@@ -110,6 +110,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const { email, username, password } = req.body;
 
+  console.log(username);
+
   if (!username && !email) {
     throw new ApiError(400, "username or email is required");
   }
@@ -248,7 +250,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(200, req.user, "current user fetched succesfully ");
+    .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -390,11 +392,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
           $size: "$subscribedTo",
         },
         isSubscribed: {
-          $cond: {
-            if: { $in: [req.user?._id, "$subscriber.subscriber"] },
-            then: true,
-            else: false,
-          },
+          $in: [req.user?._id, "$subscribedTo.subscriber"],
         },
       },
     },
