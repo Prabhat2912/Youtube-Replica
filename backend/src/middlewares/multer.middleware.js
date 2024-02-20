@@ -5,7 +5,10 @@ const storage = multer.diskStorage({
     cb(null, "./public/temp");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    const originalname = file.originalname;
+    // Remove spaces from the original filename
+    const filename = originalname.replace(/\s+/g, "");
+    cb(null, filename);
   },
 });
 
