@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "../../assets/images/logo.png";
 import { FaSearch } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Button from "../Button/button";
+import Modal from "../Modal/Modal";
+import Login from "../Login/Login";
 
 const Header = () => {
   return (
@@ -21,6 +23,7 @@ const Header = () => {
         <Button icon={<BsThreeDotsVertical />} color={"white"} />
 
         <Button
+          href={"/login"}
           text={"Log in"}
           color={"white"}
           bg={"transparent"}
@@ -28,7 +31,8 @@ const Header = () => {
             "hover:bg-gray-800 rounded-md transition-all duration-300 ease-in-out  "
           }
         />
-        <Button text={"Sign up"} hover={true} />
+
+        <Button href={"/signup"} text={"Sign up"} hover={true} />
       </div>
     </div>
   );
