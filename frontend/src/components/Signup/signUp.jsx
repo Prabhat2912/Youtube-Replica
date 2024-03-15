@@ -4,7 +4,11 @@ import authApi from "../../Redux/Features/Auth/AuthApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { login, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import {
+  login,
+  register,
+  selectAuth,
+} from "../../Redux/Features/Auth/AuthSlice";
 import { useEffect } from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import uploadOnCloudinary from "../../function/cloudinary";
@@ -21,25 +25,44 @@ const SignUp = () => {
 
   const [images, setImages] = useState({ avatarFile: "", coverImageFile: "" });
   const authState = useSelector(selectAuth);
+  const dispatch = useDispatch();
+  const [preview, setPreview] = React.useState(null);
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      setPreview(reader.result);
+    };
+  };
+
+  const navigate = useNavigate();
   const handleSignUp = async (e) => {
     e.preventDefault();
+
     try {
-      const res1 = await uploadOnCloudinary(images.avatarFile);
+      const [res1, res2] = await Promise.all([
+        uploadOnCloudinary(images.avatarFile),
+        uploadOnCloudinary(images.coverImageFile),
+      ]);
 
-      setData({ ...data, avatar: res1.url });
       console.log("Avatar uploaded and data updated:", res1?.url);
-
-      const res2 = await uploadOnCloudinary(images.coverImageFile);
-      setData({ ...data, coverImage: res2.url });
       console.log("Cover image uploaded and data updated:", res2?.url);
+
+      const res = dispatch(
+        register({ ...data, avatar: res1.url, coverImage: res2.url })
+      );
+      console.log(res);
     } catch (error) {
-      console.error("Error signingUp in:", error);
+      console.error("Error signing up:", error);
     }
   };
+
   useEffect(() => {
-    console.log(data.avatar, "avatar25");
-    console.log(data.coverImage, "coverImage25");
-  }, [data.avatar, data.coverImage]);
+    console.log(data, "datas");
+  }, [data]);
   useEffect(() => {
     console.log(images.avatarFile, "avatar");
     console.log(images.coverImageFile, "coverImage");
@@ -84,11 +107,13 @@ const SignUp = () => {
         <input
           type="file"
           className="px-4 py-2 rounded-md outline-none target:text-white "
-          onChange={(e) =>
-            setImages({ ...images, avatarFile: e.target.files[0] })
-          }
+          onChange={(e) => {
+            setImages({ ...images, avatarFile: e.target.files[0] });
+            handleImageChange(e);
+          }}
           style={{ color: "white" }}
         />
+        {preview && <img alt="image" src={preview} width={60} height={50} />}
         <h1 className="text-white">Cover Image</h1>
         <input
           type="file"

@@ -17,6 +17,22 @@ export const login = createAsyncThunk(
     }
   }
 );
+export const register = createAsyncThunk(
+  "auth/register",
+  async (credentials, thunkAPI) => {
+    try {
+      const res = await authApi.register(credentials);
+      if (!res) {
+        return thunkAPI.rejectWithValue("Registration failed");
+      }
+
+      console.log(res);
+      return res;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
 
 const initialState = {
   isLoading: false,
@@ -44,6 +60,21 @@ const authSlice = createSlice({
         state.isError = false;
       })
       .addCase(login.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+      .addCase(register.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(register.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isLogin = true;
+        state.refreshToken = action.payload.refreshToken;
+        state.accessToken = action.payload.accessToken;
+        state.isError = false;
+      })
+      .addCase(register.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       });
