@@ -10,7 +10,6 @@ export const login = createAsyncThunk(
         return thunkAPI.rejectWithValue("Login failed");
       }
 
-      console.log(res);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
@@ -26,7 +25,6 @@ export const register = createAsyncThunk(
         return thunkAPI.rejectWithValue("Registration failed");
       }
 
-      console.log(res);
       return res;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
@@ -40,6 +38,7 @@ const initialState = {
   refreshToken: null,
   accessToken: null,
   isError: null,
+  message: null,
 };
 
 const authSlice = createSlice({
@@ -67,11 +66,9 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.isError = false;
       })
-      .addCase(register.fulfilled, (state) => {
+      .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isLogin = true;
-        state.refreshToken = action.payload.refreshToken;
-        state.accessToken = action.payload.accessToken;
+        state.message = action.payload.message;
         state.isError = false;
       })
       .addCase(register.rejected, (state) => {

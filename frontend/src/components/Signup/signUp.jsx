@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import logo from "../../assets/images/logo.png";
-import authApi from "../../Redux/Features/Auth/AuthApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
@@ -9,8 +8,6 @@ import {
   register,
   selectAuth,
 } from "../../Redux/Features/Auth/AuthSlice";
-import { useEffect } from "react";
-import { Cloudinary } from "@cloudinary/url-gen";
 import uploadOnCloudinary from "../../function/cloudinary";
 
 const SignUp = () => {
@@ -28,13 +25,13 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const [preview, setPreview] = React.useState(null);
 
-  const handleImageChange = (event) => {
+  const handleImageChange = (event, imageType) => {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.readAsDataURL(file);
 
     reader.onload = () => {
-      setPreview(reader.result);
+      setPreview({ ...preview, [imageType]: reader.result });
     };
   };
 
@@ -47,88 +44,100 @@ const SignUp = () => {
         uploadOnCloudinary(images.avatarFile),
         uploadOnCloudinary(images.coverImageFile),
       ]);
-
-      console.log("Avatar uploaded and data updated:", res1?.url);
-      console.log("Cover image uploaded and data updated:", res2?.url);
-
-      const res = dispatch(
+      const registerResponse = await dispatch(
         register({ ...data, avatar: res1.url, coverImage: res2.url })
       );
-      console.log(res);
+      console.log(registerResponse);
+      if (registerResponse.payload) {
+        const loginResponse = await dispatch(
+          login({ username: data.username, password: data.password })
+        );
+        console.log(loginResponse);
+
+        if (loginResponse.payload) {
+          navigate("/");
+        }
+      }
     } catch (error) {
       console.error("Error signing up:", error);
     }
   };
 
-  useEffect(() => {
-    console.log(data, "datas");
-  }, [data]);
-  useEffect(() => {
-    console.log(images.avatarFile, "avatar");
-    console.log(images.coverImageFile, "coverImage");
-  }, [images]);
-
   return (
-    <div className="w-full p-4 h-[full] flex flex-col justify-center  bg-black items-center ">
+    <div className="w-full p-4 h-[full] bg-black/90 text-white flex flex-col justify-center   items-center ">
       <img src={logo} alt="" width={80} />
       <form
-        className="flex flex-col justify-center  rounded-md shadow-md p-8 w-[400px]  gap-y-4 "
+        className="flex flex-col bg-black justify-center  rounded-md shadow-md p-8 w-[400px] transition-all duration-200 ease-in-out  gap-y-4 "
         onSubmit={handleSignUp}
       >
-        <h1 className="text-white">Full Name</h1>
+        <h1 className="">Full Name</h1>
         <input
           type="text"
           onChange={(e) => setData({ ...data, fullName: e.target.value })}
           placeholder="Enter Full Name"
-          className="outline-none px-4 py-2 rounded-md "
+          className="outline-none text-black px-4 py-2 rounded-md "
         />
-        <h1 className="text-white">Username</h1>
+        <h1 className="">Username</h1>
         <input
           type="text"
           onChange={(e) => setData({ ...data, username: e.target.value })}
           placeholder="Enter Username"
-          className="outline-none px-4 py-2 rounded-md   "
+          className="outline-none text-black px-4 py-2 rounded-md   "
         />
-        <h1 className="text-white">Email</h1>
+        <h1 className="">Email</h1>
         <input
           type="email"
           placeholder="Enter Email"
-          className="px-4 py-2 rounded-md outline-none "
+          className="px-4 py-2 text-black rounded-md outline-none "
           onChange={(e) => setData({ ...data, email: e.target.value })}
         />
-        <h1 className="text-white">Password</h1>
+        <h1 className="">Password</h1>
         <input
           type="password"
           placeholder="Enter Password"
-          className="px-4 py-2 rounded-md outline-none "
+          className="px-4 py-2 text-black rounded-md outline-none "
           onChange={(e) => setData({ ...data, password: e.target.value })}
         />
-        <h1 className="text-white">Avatar</h1>
+        <h1 className="">Avatar</h1>
         <input
           type="file"
-          className="px-4 py-2 rounded-md outline-none target:text-white "
+          className="px-4 py-2 rounded-md outline-none  "
           onChange={(e) => {
             setImages({ ...images, avatarFile: e.target.files[0] });
-            handleImageChange(e);
+            handleImageChange(e, "avatar");
           }}
-          style={{ color: "white" }}
         />
-        {preview && <img alt="image" src={preview} width={60} height={50} />}
-        <h1 className="text-white">Cover Image</h1>
+        {preview?.avatar && (
+          <div className="flex w-full h-[50px] justify-center ">
+            <img alt="avatar" src={preview.avatar} width={60} height={50} />
+          </div>
+        )}
+
+        <h1 className="">Cover Image</h1>
         <input
           type="file"
-          className="px-4 py-2 rounded-md outline-none target:text-white "
-          onChange={(e) =>
-            setImages({ ...images, coverImageFile: e.target.files[0] })
-          }
-          style={{ color: "white" }}
+          className="px-4 py-2 rounded-md outline-none  "
+          onChange={(e) => {
+            setImages({ ...images, coverImageFile: e.target.files[0] });
+            handleImageChange(e, "coverImage");
+          }}
         />
+        {preview?.coverImage && (
+          <div className="flex w-full h-[50px] justify-center ">
+            <img
+              alt="coverImage"
+              src={preview.coverImage}
+              width={60}
+              height={60}
+            />
+          </div>
+        )}
 
         <button
           type="submit"
           className="px-4 py-2 rounded-md bg-gray-900 hover:bg-gray-500 text-white transition-all duration-150 ease-in hover:text-black"
         >
-          SignUp
+          {authState.isLoading ? "Loading..." : "Sign Up"}
         </button>
       </form>
     </div>
