@@ -64,10 +64,10 @@ const SignUp = () => {
   };
 
   return (
-    <div className="w-full p-4 h-[full] bg-black/90 text-white flex flex-col justify-center   items-center ">
+    <div className="w-full p-4 h-[full]  flex flex-col justify-center   items-center ">
       <img src={logo} alt="" width={80} />
       <form
-        className="flex flex-col bg-black justify-center  rounded-md shadow-md p-8 w-[400px] transition-all duration-200 ease-in-out  gap-y-4 "
+        className="flex flex-col  bg-gray-200 justify-center  rounded-md shadow-md p-8 w-[400px] transition-all duration-200 ease-in-out  gap-y-4 "
         onSubmit={handleSignUp}
       >
         <h1 className="">Full Name</h1>
@@ -99,39 +99,44 @@ const SignUp = () => {
           onChange={(e) => setData({ ...data, password: e.target.value })}
         />
         <h1 className="">Avatar</h1>
-        <input
-          type="file"
-          className="px-4 py-2 rounded-md outline-none  "
-          onChange={(e) => {
-            setImages({ ...images, avatarFile: e.target.files[0] });
-            handleImageChange(e, "avatar");
-          }}
-        />
-        {preview?.avatar && (
-          <div className="flex w-full h-[50px] justify-center ">
-            <img alt="avatar" src={preview.avatar} width={60} height={50} />
-          </div>
-        )}
+        <div className="border rounded-lg border-black">
+          {" "}
+          <input
+            type="file"
+            className="px-4 py-2 rounded-md border-b-2 w-full border-black outline-none  "
+            onChange={(e) => {
+              setImages({ ...images, avatarFile: e.target.files[0] });
+              handleImageChange(e, "avatar");
+            }}
+          />
+          {preview?.avatar && (
+            <div className="flex w-full h-[50px] justify-center ">
+              <img alt="avatar" src={preview.avatar} width={60} height={50} />
+            </div>
+          )}
+        </div>
 
         <h1 className="">Cover Image</h1>
-        <input
-          type="file"
-          className="px-4 py-2 rounded-md outline-none  "
-          onChange={(e) => {
-            setImages({ ...images, coverImageFile: e.target.files[0] });
-            handleImageChange(e, "coverImage");
-          }}
-        />
-        {preview?.coverImage && (
-          <div className="flex w-full h-[50px] justify-center ">
-            <img
-              alt="coverImage"
-              src={preview.coverImage}
-              width={60}
-              height={60}
-            />
-          </div>
-        )}
+        <div className="border rounded-lg border-black">
+          <input
+            type="file"
+            className="px-4 py-2 rounded-md border-b-2 w-full border-black outline-none  "
+            onChange={(e) => {
+              setImages({ ...images, coverImageFile: e.target.files[0] });
+              handleImageChange(e, "coverImage");
+            }}
+          />
+          {preview?.coverImage && (
+            <div className="flex w-full h-[50px] justify-center ">
+              <img
+                alt="coverImage"
+                src={preview.coverImage}
+                width={60}
+                height={60}
+              />
+            </div>
+          )}{" "}
+        </div>
 
         <button
           type="submit"

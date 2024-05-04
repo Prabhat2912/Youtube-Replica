@@ -18,16 +18,12 @@ const VideoCard = ({ data }) => {
   return (
     <Link
       to={data.videoLink}
-      className="w-[299px] bg-black h-[260px] flex flex-col rounded-sm mt-1 hover:border  p-1 transition-transform duration-150 ease-in-out "
+      className="w-[24%] bg-white/80 h-[35%] text-black flex flex-col rounded-lg mt-1 hover:border  p-2 transition-all duration-150 ease-in-out "
     >
       <div className="mb-5">
-        <img
-          src={data.thumbnail}
-          alt="thumbnail"
-          className="w-full h-[134px] "
-        />
+        <img src={data.thumbnail} alt="thumbnail" className="w-full h-[30%] " />
       </div>
-      <div className=" w-full flex mb-2 gap-1  ">
+      <div className=" w-full items-center justify-center flex mb-2 gap-1  ">
         <img
           src={data.profilePic}
           alt="DP"
@@ -35,12 +31,12 @@ const VideoCard = ({ data }) => {
           height={40}
           className="rounded-full"
         />
-        <h1 className="text-white w-[80%] font-medium text-[16px] leading-6 ">
+        <h1 className=" w-[90%]  font-medium text-[16px] leading-6 ">
           {data.title}
         </h1>
       </div>
 
-      <div className="w-full flex flex-col ml-14 text-white  font-normal text-[12px] leading-5 ">
+      <div className="w-full flex flex-col ml-14   font-normal text-[12px] leading-5 ">
         <div className="flex gap-2 ">
           <p>{formatViews(data.views)} </p>
           <p>•</p>
