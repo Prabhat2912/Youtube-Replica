@@ -51,7 +51,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
   //TODO: get playlist by id
 
   if (!playlistId) {
-    throw new ApiError(400, "45");
+    throw new ApiError(400, "Playlist not found");
   }
 
   const playlist = await Playlist.findById(playlistId);

@@ -1,35 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+  Navigate,
+} from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import Home from "./pages/Home/home";
+import Dashboard from "./pages/Dashboard/dashboard";
+import Profile from "./pages/Profile/profile";
+import SearchView from "./pages/SearchView/searchView";
+import VideoPlayer from "./pages/Video-Player/videoPlayer";
+import Login from "./components/Login/Login";
+import { useSelector } from "react-redux";
+import { selectAuth } from "./Redux/Features/Auth/AuthSlice";
+import SignUp from "./components/Signup/signUp";
+
+const isAuthenticated = () => {
+  const authState = useSelector(selectAuth);
+  const isLoggedIn = authState.isLogin;
+  return isLoggedIn;
+};
+
+const ProtectedRoute = ({ element, path }) => {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return element;
+};
+
+const routes = (
+  <Route>
+    <Route path="signup" element={<SignUp />} />
+    <Route path="login" element={<Login />} />
+    <Route path="/" element={<Layout />}>
+      <Route path="/" element={<Home />} />
+
+      <Route
+        path="dashboard"
+        element={<ProtectedRoute element={<Dashboard />} />}
+      />
+      <Route
+        path="profile"
+        element={<ProtectedRoute element={<Profile />} />}
+      />
+      <Route
+        path="search-view"
+        element={<ProtectedRoute element={<SearchView />} />}
+      />
+      <Route path="video" element={<VideoPlayer />} />
+
+      <Route path="*" element={<div>Not Found</div>} />
+    </Route>
+  </Route>
+);
+
+const router = createBrowserRouter(createRoutesFromElements(routes));
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

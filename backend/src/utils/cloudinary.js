@@ -26,6 +26,25 @@ const uploadOnCloudinary = async (localFilePath) => {
     return null;
   }
 };
+const getVideoDurationFromCloudinary = async (videoUrl) => {
+  try {
+    // Extract public ID from the video URL
+    const publicId = extractPublicIdFromUrl(videoUrl);
+
+    // Use Cloudinary API to get resource details
+    const result = await cloudinary.api.resource(publicId, {
+      quality_analysis: true,
+    });
+
+    // Extract and return video duration
+    const duration = result.quality_analysis.video.duration;
+    console.log("Video duration:", duration);
+    return duration;
+  } catch (error) {
+    console.error("Error getting video duration from Cloudinary:", error);
+    return null;
+  }
+};
 
 const videoDuration = async (videoUrl) => {
   try {
@@ -101,4 +120,5 @@ export {
   deleteImageFromCloudinary,
   videoDuration,
   deleteVideoFromCloudinary,
+  getVideoDurationFromCloudinary,
 };
