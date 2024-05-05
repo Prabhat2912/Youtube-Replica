@@ -22,7 +22,9 @@ const Header = () => {
 
   return (
     <div className="w-fullh-[72px] px-11 flex items-center justify-between border-b">
-      <img src={logo} width={63} height={63} alt="logo" />
+      <a href="/">
+      <img  src={logo} width={63} height={63} alt="logo" />
+      </a>
       <div className="relative flex items-center w-1/4 rounded-md">
         <FaSearch className="absolute left-2" />
         <input
