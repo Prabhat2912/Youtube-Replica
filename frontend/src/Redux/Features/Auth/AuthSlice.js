@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authApi from "./AuthApi";
-
+import Cookies from "js-cookie";
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, thunkAPI) => {
@@ -31,6 +31,58 @@ export const register = createAsyncThunk(
     }
   }
 );
+
+export const refreshToken = createAsyncThunk('auth/refreshToken', async (refreshToken, thunkAPI) => {
+  try {
+    const res = await authApi.refreshToken(refreshToken);
+    if (!res) {
+      return thunkAPI.rejectWithValue("Token refresh failed");
+    }
+    return res;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
+  }
+})
+
+export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+  // Just clear the local storage and cookies
+  try {
+    localStorage.removeItem("user");
+    localStorage.removeItem('refreshToken');
+    Cookies.remove('accessToken');
+    return; // Return undefined to resolve the thunk
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
+
+
+export const checkAuthOnRefresh = createAsyncThunk(
+  "auth/checkAuthOnRefresh",
+  async (_, thunkAPI) => {
+    try {
+      const accessToken = Cookies.get("accessToken");
+      const refreshTokens = localStorage.getItem("refreshToken");
+
+      if (accessToken) {
+        return { accessToken, refreshTokens };
+      } else if (refreshTokens) {
+
+        const result = await thunkAPI.dispatch(refreshToken(refreshTokens));
+        if (refreshToken.fulfilled.match(result)) {
+          return result.payload;
+        } else {
+          return thunkAPI.rejectWithValue(result.payload);
+        }
+      } else {
+        return thunkAPI.rejectWithValue("No tokens available");
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 
 const initialState = {
   isLoading: false,
@@ -76,7 +128,26 @@ const authSlice = createSlice({
       .addCase(register.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.accessToken = action.payload.accessToken;
+      }).addCase(refreshToken.rejected, (state, action) => {
+        state.message = action.payload.message
+      }).addCase(checkAuthOnRefresh.fulfilled, (state, action) => {
+        state.isLogin = true;
+        state.user = JSON.parse(localStorage.getItem("user"))
+        state.accessToken = action.payload?.accessToken;
+        state.refreshToken = action.payload?.refreshToken;
+      }).addCase(checkAuthOnRefresh.rejected, (state) => {
+        state.isLogin = false;
+      }).addCase(logout.fulfilled, (state) => {
+        console.log('Logout successful, resetting auth state');
+        state.isLogin = false;
+        state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
       });
+
   },
 });
 

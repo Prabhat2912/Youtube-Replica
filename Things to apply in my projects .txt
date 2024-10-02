@@ -2,3 +2,4 @@ Things to apply in my projects
 react dropzone
 image preview
 good ui practices
+improve ux and ui
