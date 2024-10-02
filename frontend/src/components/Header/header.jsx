@@ -6,6 +6,8 @@ import Login from "../Login/Login";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import Dropdown from "../Dropdown/Dropdown";
+import { useEffect } from "react";
 
 const Header = () => {
   const authState = useSelector(selectAuth);
@@ -23,14 +25,33 @@ const Header = () => {
 
   const dispatch = useDispatch();
   const handleLogout = () => {
-    // Dispatch the logout action to update the Redux state
     dispatch(logout());
 
-    // Clear local storage and cookies
     localStorage.removeItem("user");
     localStorage.removeItem("refreshToken");
     Cookies.remove("accessToken");
   };
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const trigerDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        !event.target.closest(".dropdown-trigger") &&
+        !event.target.closest(".dropdown-menu")
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-fullh-[72px] px-11 flex items-center justify-between border-b">
@@ -47,13 +68,16 @@ const Header = () => {
       </div>
       <div className="flex gap-2 p-4 items-center">
         {authState.isLogin ? (
-          <div>
-            <img
-              src={authState.user?.avatar}
-              className="rounded-full"
-              width={40}
-              alt="profilepic"
-            />
+          <div className=" flex flex-col items-end relative dropdown-trigger ">
+            <button onClick={trigerDropdown}>
+              <img
+                src={authState.user?.avatar}
+                className="rounded-full"
+                width={40}
+                alt="profilepic"
+              />
+            </button>
+            <Dropdown isOpen={showDropdown} />
           </div>
         ) : (
           <>

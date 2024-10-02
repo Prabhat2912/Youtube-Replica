@@ -141,7 +141,7 @@ const authSlice = createSlice({
       }).addCase(checkAuthOnRefresh.rejected, (state) => {
         state.isLogin = false;
       }).addCase(logout.fulfilled, (state) => {
-        console.log('Logout successful, resetting auth state');
+
         state.isLogin = false;
         state.user = null;
         state.accessToken = null;

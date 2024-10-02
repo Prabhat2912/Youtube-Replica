@@ -3,7 +3,7 @@ import VideoCard from "../../components/VideoCard/videoCard";
 
 const Home = () => {
   return (
-    <div className="p-4 bg-gray-200 w-full justify-center overflow-y-scroll ">
+    <div className="p-4 bg-gray-200 w-full justify-center overflow-y-scroll  scroll-hidden ">
       <div className="flex  flex-wrap overflow-hidden gap-4 w-full  ">
         {videoData.map((video, i) => (
           <VideoCard key={i} data={video} />
