@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import profileApi from './ProfileApi'
-
 const initialState = {
     isLoading: false,
     isError: false,
@@ -30,9 +29,12 @@ export const updateAccount = createAsyncThunk(
     'profile/updateAccount', async (credentials, thunkApi) => {
         try {
             const res = await profileApi.updateAccount(credentials);
+
             if (!res) {
                 return thunkApi.rejectWithValue("Account update failed");
             }
+
+
             return res;
         } catch (error) {
             return thunkApi.rejectWithValue(error);
@@ -71,6 +73,7 @@ export const updateCoverImage = createAsyncThunk(
 
 
 
+
 const profileSlice = createSlice({
     name: 'profile',
     initialState,
@@ -95,11 +98,13 @@ const profileSlice = createSlice({
             state.isError = false;
             state.isLoading = false
             state.message = action.payload.message
+            state.user = action.payload?.user
+            localStorage.setItem('user', action.payload?.user)
         }).addCase(updateAccount.rejected, (state, action) => {
             state.isError = true;
             state.isLoading = false
-            state.message = action.payload.message
-            state.user = action.payload?.user
+            state.message = action.payload?.message
+
 
         }).addCase(updateAvatar.pending, (state) => {
             state.isError = false;
@@ -108,11 +113,15 @@ const profileSlice = createSlice({
             state.isError = false;
             state.isLoading = false
             state.message = action.payload.message
+            state.user = action.payload?.user
+            localStorage.setItem('user', action.payload?.user)
         }).addCase(updateAvatar.rejected, (state, action) => {
             state.isError = true;
             state.isLoading = false
             state.message = action.payload.message
-            state.user = action.payload?.user
+
+
+
 
         }).addCase(updateCoverImage.pending, (state) => {
             state.isError = false;
@@ -121,11 +130,13 @@ const profileSlice = createSlice({
             state.isError = false;
             state.isLoading = false
             state.message = action.payload.message
+            state.user = action.payload?.user
+            localStorage.setItem('user', action.payload?.user)
         }).addCase(updateCoverImage.rejected, (state, action) => {
             state.isError = true;
             state.isLoading = false
             state.message = action.payload.message
-            state.user = action.payload?.user
+
 
         })
     }
