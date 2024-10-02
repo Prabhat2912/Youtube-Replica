@@ -1,64 +1,69 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import {
-  changePassword,
   selectProfile,
+  updateAccount,
 } from "../../Redux/Features/Profile/ProfileSlice";
 import { useState } from "react";
+import { ScaleLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { ScaleLoader } from "react-spinners";
+import {
+  checkAuthOnRefresh,
+  setUser,
+} from "../../Redux/Features/Auth/AuthSlice";
 
-const PasswordChange = ({ isModalOpen }) => {
+const UpdateAccount = ({ isModalOpen }) => {
   const profileState = useSelector(selectProfile);
-  const [pass, setPass] = useState({ oldPassword: "", newPassword: "" });
   const dispatch = useDispatch();
-
-  const handlePassChange = (e) => {
+  const [data, setData] = useState({ email: "", fullName: "" });
+  const handleAccountUpdate = (e) => {
     e.preventDefault();
-    const passChangePromise = () => {
+    const accountUpdatePromise = () => {
       return new Promise(async (resolve, reject) => {
         try {
-          const res = await dispatch(changePassword(pass));
+          const res = await dispatch(updateAccount(data));
           if (res.payload) {
             isModalOpen(false);
             resolve(res.payload);
+
+            await dispatch(setUser(res.payload?.data));
           } else {
-            reject(new Error(res.payload?.error || "Password change failed"));
+            reject(new Error(res.payload?.error || "Account update failed"));
           }
         } catch (error) {
-          reject(new Error("An error occurred while changing password"));
+          reject(new Error("An error occurred while updating the account"));
         }
       });
     };
-    toast.promise(passChangePromise, {
+    toast.promise(accountUpdatePromise, {
       loading: "Loading...",
-      success: () => `Password Changed Successfully`,
+      success: () => `Account updated Successfully`,
       error: (error) => `Error:${error}`,
     });
   };
 
   return (
     <div className="w-80 flex flex-col  mt-2 rounded-md gap-6 ">
-      <h1>Change Password</h1>
+      <h1>Update Account Details</h1>
       <form
         className="flex flex-col justify-center bg-gray-200  rounded-md  p-4 gap-6"
-        onSubmit={handlePassChange}
+        onSubmit={handleAccountUpdate}
       >
-        <input
-          type="password"
-          className="px-4 py-2 rounded-md outline-none "
-          placeholder="Enter old password"
-          onChange={(e) => {
-            setPass({ ...pass, oldPassword: e.target.value });
-          }}
-        />
         <input
           type="text"
           className="px-4 py-2 rounded-md outline-none "
-          placeholder="Enter new password"
+          placeholder="Enter full name"
           onChange={(e) => {
-            setPass({ ...pass, newPassword: e.target.value });
+            setData({ ...data, fullName: e.target.value });
+          }}
+        />
+        <input
+          type="email"
+          className="px-4 py-2 rounded-md outline-none "
+          placeholder="Enter new email"
+          onChange={(e) => {
+            setData({ ...data, email: e.target.value });
           }}
         />
         <button
@@ -66,7 +71,7 @@ const PasswordChange = ({ isModalOpen }) => {
           className={`px-4 py-2 rounded-md bg-gray-900 ${
             profileState.isLoading ? "" : "hover:bg-gray-500"
           }  text-white transition-all h-10 duration-150 ease-in`}
-          onClick={handlePassChange}
+          onClick={handleAccountUpdate}
         >
           {profileState.isLoading ? (
             <ScaleLoader
@@ -75,7 +80,7 @@ const PasswordChange = ({ isModalOpen }) => {
               height={20}
             />
           ) : (
-            ` Change Password`
+            ` Update Details`
           )}
         </button>
       </form>
@@ -83,4 +88,4 @@ const PasswordChange = ({ isModalOpen }) => {
   );
 };
 
-export default PasswordChange;
+export default UpdateAccount;
