@@ -9,6 +9,8 @@ import {
   selectAuth,
 } from "../../Redux/Features/Auth/AuthSlice";
 import uploadOnCloudinary from "../../function/cloudinary";
+import { toast } from "sonner";
+import { ScaleLoader } from "react-spinners";
 
 const SignUp = () => {
   const [data, setData] = useState({
@@ -39,28 +41,44 @@ const SignUp = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    try {
-      const [res1, res2] = await Promise.all([
-        uploadOnCloudinary(images.avatarFile),
-        uploadOnCloudinary(images.coverImageFile),
-      ]);
-      const registerResponse = await dispatch(
-        register({ ...data, avatar: res1.url, coverImage: res2.url })
-      );
-      console.log(registerResponse);
-      if (registerResponse.payload) {
-        const loginResponse = await dispatch(
-          login({ username: data.username, password: data.password })
-        );
-        console.log(loginResponse);
+    const signUpPromise = () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const [res1, res2] = await Promise.all([
+            uploadOnCloudinary(images.avatarFile),
+            uploadOnCloudinary(images.coverImageFile),
+          ]);
 
-        if (loginResponse.payload) {
-          navigate("/");
+          const registerResponse = await dispatch(
+            register({ ...data, avatar: res1.url, coverImage: res2.url })
+          );
+          console.log(registerResponse);
+
+          if (registerResponse.payload) {
+            const loginResponse = await dispatch(
+              login({ username: data.username, password: data.password })
+            );
+            console.log(loginResponse);
+
+            if (loginResponse.payload) {
+              resolve("Registration and login successful!");
+              navigate("/");
+            } else {
+              reject(new Error("Login failed after registration."));
+            }
+          } else {
+            reject(new Error("Registration failed."));
+          }
+        } catch (error) {
+          reject(new Error("An error occurred during sign-up."));
         }
-      }
-    } catch (error) {
-      console.error("Error signing up:", error);
-    }
+      });
+    };
+    toast.promise(signUpPromise, {
+      loading: "Signing up...",
+      success: (message) => "User Registered successfully",
+      error: (error) => `Error: ${error.message}`,
+    });
   };
 
   return (
@@ -140,9 +158,20 @@ const SignUp = () => {
 
         <button
           type="submit"
-          className="px-4 py-2 rounded-md bg-gray-900 hover:bg-gray-500 text-white transition-all duration-150 ease-in hover:text-black"
+          className={`px-4 py-2 rounded-md bg-gray-900 h-10 ${
+            authState.isLoading ? "" : "hover:bg-gray-500 hover:text-black"
+          }  text-white transition-all duration-150 ease-in hover:text-black`}
+          disabled={authState.isLoading}
         >
-          {authState.isLoading ? "Loading..." : "Sign Up"}
+          {authState.isLoading ? (
+            <ScaleLoader
+              loading={authState.isLoading}
+              color="white"
+              height={20}
+            />
+          ) : (
+            "Sign Up"
+          )}
         </button>
       </form>
     </div>

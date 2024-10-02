@@ -19,6 +19,7 @@ import {
   checkAuthOnRefresh,
 } from "./Redux/Features/Auth/AuthSlice";
 import SignUp from "./components/Signup/signUp";
+import { Toaster } from "sonner";
 
 const ProtectedRoute = ({ element }) => {
   const { isLogin } = useSelector(selectAuth);
@@ -69,7 +70,11 @@ function App() {
     }
   }, [dispatch, isLogin]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />;
+    </>
+  );
 }
 
 export default App;

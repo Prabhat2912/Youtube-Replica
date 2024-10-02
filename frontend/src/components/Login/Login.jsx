@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import logo from "../../assets/images/logo.png";
-import authApi from "../../Redux/Features/Auth/AuthApi";
+
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { login, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import { useEffect } from "react";
+import { toast } from "sonner";
+import { ScaleLoader } from "react-spinners";
 
 const Login = ({ isModalOpen }) => {
   const [data, setData] = useState({ username: "", email: "", password: "" });
@@ -23,16 +25,27 @@ const Login = ({ isModalOpen }) => {
   const authState = useSelector(selectAuth);
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const res = dispatch(login(data));
-      console.log(res);
-      if (res?.data?.user) {
-        navigate("/");
-        isModalOpen(false);
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
-    }
+    const loginPromise = () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const res = await dispatch(login(data));
+          if (res?.payload?.user) {
+            navigate("/");
+            isModalOpen(false);
+            resolve(res.payload);
+          } else {
+            reject(new Error(res.payload?.error || "Login failed"));
+          }
+        } catch (error) {
+          reject(new Error("An error occurred while logging in"));
+        }
+      });
+    };
+    toast.promise(loginPromise, {
+      loading: "Loading...",
+      success: (data) => `Login Successful`,
+      error: (error) => `Error: ${error.message}`,
+    });
   };
   useEffect(() => {
     console.log(authState);
@@ -62,9 +75,20 @@ const Login = ({ isModalOpen }) => {
 
         <button
           type="submit"
-          className="px-4 py-2 rounded-md bg-gray-900 hover:bg-gray-500 text-white transition-all duration-150 ease-in "
+          className={`px-4 py-2 rounded-md bg-gray-900 ${
+            authState.isLoading ? "" : "hover:bg-gray-500"
+          }  text-white transition-all h-10 duration-150 ease-in `}
+          disabled={authState.isLoading}
         >
-          {authState.isLoading ? "Loading..." : "Login"}
+          {authState.isLoading ? (
+            <ScaleLoader
+              loading={authState.isLoading}
+              color="white"
+              height={20}
+            />
+          ) : (
+            "Login"
+          )}
         </button>
         <h1 className="w-full text-center">OR</h1>
         <button
