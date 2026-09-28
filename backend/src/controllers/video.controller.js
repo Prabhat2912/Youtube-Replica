@@ -84,19 +84,36 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  //TODO: get video by id|
-  const existedVideo = await Video.findById(videoId).populate(
-    "owner",
-    "fullName username avatar"
-  );
+
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid video id");
+  }
+
+  // Every watch counts, then serve the doc with live counters.
+  const existedVideo = await Video.findByIdAndUpdate(
+    videoId,
+    { $inc: { views: 1 } },
+    { new: true }
+  ).populate("owner", "fullName username avatar");
 
   if (!existedVideo) {
     throw new ApiError(400, "Video not found");
   }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, existedVideo, "Video Fetched successfully"));
+  const { Like } = await import("../models/like.model.js");
+  const { Comment } = await import("../models/comment.model.js");
+  const [likesCount, commentsCount] = await Promise.all([
+    Like.countDocuments({ video: videoId }),
+    Comment.countDocuments({ video: videoId }),
+  ]);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { ...existedVideo.toObject(), likesCount, commentsCount },
+      "Video Fetched successfully"
+    )
+  );
 });
 
 const updateVideo = asyncHandler(async (req, res) => {

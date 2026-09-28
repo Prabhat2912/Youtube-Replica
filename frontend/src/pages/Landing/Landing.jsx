@@ -1,11 +1,12 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FiPlay, FiArrowRight, FiShield, FiZap, FiFilm, FiRadio, FiStar } from "react-icons/fi";
 import Logo from "../../components/Brand/Logo";
 import VideoCard from "../../components/VideoCard/videoCard";
-import { videos } from "../../data/videos";
+import { feedApi } from "../../function/libraryApi";
+import { toCard } from "../../function/format";
 import { usePageMeta } from "../../function/pageMeta";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -26,6 +27,26 @@ const Bulbs = () => (
 
 const Landing = () => {
   const root = useRef(null);
+  const [feed, setFeed] = useState([]);
+  const [feedFailed, setFeedFailed] = useState(false);
+
+  // Live program for the marquee screen and rails — never fixtures.
+  useEffect(() => {
+    let live = true;
+    feedApi
+      .videos({ limit: 8, sortBy: "createdAt", sortType: "desc" })
+      .then((data) => {
+        if (live) setFeed(Array.isArray(data) ? data.map(toCard) : []);
+      })
+      .catch(() => {
+        if (live) setFeedFailed(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const featured = feed[0];
 
   usePageMeta(
     "A lighter home for video",
@@ -176,31 +197,48 @@ const Landing = () => {
             </div>
           </div>
 
-          <div data-parallax>
-            <div className="rise rounded-3xl border border-white/10 bg-white/[0.04] pb-5 shadow-card backdrop-blur-xl" style={{ animationDelay: "0.12s" }}>
-              <Bulbs />
-              <div className="px-5 pt-3">
-                <div className="relative overflow-hidden rounded-2xl">
-                  <img src={videos[0].thumbnail} alt="Tonight's featured premiere" className="aspect-video w-full object-cover" />
-                  <span className="absolute left-3 top-3 rounded-full bg-ember px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white">
-                    Tonight 9 PM
-                  </span>
-                  <Link to="/home" aria-label="Play tonight's premiere" className="absolute inset-0 grid place-items-center">
-                    <span className="grid h-16 w-16 place-items-center rounded-full bg-ember text-white shadow-glow transition hover:scale-105">
-                      <FiPlay size={24} className="ml-1" />
+        <div data-parallax>
+          <div className="rise rounded-3xl border border-white/10 bg-white/[0.04] pb-5 shadow-card backdrop-blur-xl" style={{ animationDelay: "0.12s" }}>
+            <Bulbs />
+            <div className="px-5 pt-3">
+              {featured ? (
+                <>
+                  <div className="relative overflow-hidden rounded-2xl">
+                    <img src={featured.thumbnail} alt="Tonight's featured premiere" className="aspect-video w-full object-cover" />
+                    <span className="absolute left-3 top-3 rounded-full bg-ember px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white">
+                      Fresh premiere
                     </span>
-                  </Link>
-                </div>
-                <div className="flex items-center gap-3 px-1 pt-4">
-                  <img src={videos[0].avatar} alt="" className="h-10 w-10 rounded-full" />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold">{videos[0].title}</p>
-                    <p className="text-[13px] text-zinc-500">{videos[0].channel} · 128K waiting in line</p>
+                    <Link to={featured.videoLink} aria-label="Play tonight's premiere" className="absolute inset-0 grid place-items-center">
+                      <span className="grid h-16 w-16 place-items-center rounded-full bg-ember text-white shadow-glow transition hover:scale-105">
+                        <FiPlay size={24} className="ml-1" />
+                      </span>
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-3 px-1 pt-4">
+                    <img src={featured.avatar} alt="" className="h-10 w-10 rounded-full" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold">{featured.title}</p>
+                      <p className="text-[13px] text-zinc-500">{featured.channel} · {featured.age}</p>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="grid aspect-video place-items-center rounded-2xl border border-dashed border-white/15 p-8 text-center">
+                  <div>
+                    <p className="font-display text-lg font-bold text-zinc-200">
+                      {feedFailed ? "The projector is warming up" : "Rolling the reel…"}
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-500">
+                      {feedFailed
+                        ? "Live premieres will appear here once the network answers."
+                        : "Fetching tonight's premieres."}
+                    </p>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -280,16 +318,24 @@ const Landing = () => {
               </Link>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {videos.slice(2, 6).map((v) => (
-                <img key={v.id} src={v.thumbnail} alt="" loading="lazy" className="aspect-video w-full rounded-xl border border-white/10 object-cover" />
+              {feed.slice(0, 4).map((v) => (
+                <Link key={v.id} to={v.videoLink} aria-label={v.title}>
+                  <img src={v.thumbnail} alt="" loading="lazy" className="aspect-video w-full rounded-xl border border-white/10 object-cover transition hover:border-ember/50" />
+                </Link>
               ))}
+              {!feed.length && (
+                <p className="col-span-2 text-sm text-zinc-500 sm:col-span-4">
+                  {feedFailed ? "Creator premieres will line up here once the network answers." : "Loading premieres…"}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Now showing rail */}
-      <section data-reveal className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+      {/* Now showing rail — live network premieres only */}
+      {feed.length > 0 && (
+      <section data-reveal className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-3xl font-black tracking-tight">Now showing</h2>
           <Link to="/home" className="inline-flex items-center gap-1 text-sm font-bold text-ember hover:text-ember-bright">
@@ -297,13 +343,14 @@ const Landing = () => {
           </Link>
         </div>
         <div className="scroll-hidden -mx-4 mt-7 flex gap-5 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6">
-          {videos.slice(0, 6).map((v) => (
+          {feed.slice(0, 6).map((v) => (
             <div key={v.id} className="w-64 shrink-0 sm:w-72">
               <VideoCard data={v} />
             </div>
           ))}
         </div>
       </section>
+      )}
 
       {/* Close — gold band */}
       <section data-reveal className="bg-gold">

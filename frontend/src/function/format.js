@@ -40,6 +40,8 @@ export function toCard(v) {
     title: v?.title || "Untitled premiere",
     channel: name,
     handle: owner?.username ? `@${owner.username}` : "",
+    ownerId: owner?._id ? String(owner._id) : (typeof v?.owner === "string" ? v.owner : ""),
+    description: v?.description || "",
     avatar:
       owner?.avatar ||
       `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,

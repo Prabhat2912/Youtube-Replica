@@ -16,11 +16,20 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const comments = await Comment.find(queryOptions)
     .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(parseInt(limit));
+    .limit(parseInt(limit))
+    .populate("owner", "fullName username avatar");
+
+  const { Like } = await import("../models/like.model.js");
+  const withLikes = await Promise.all(
+    comments.map(async (c) => ({
+      ...c.toObject(),
+      likesCount: await Like.countDocuments({ comment: c._id }),
+    }))
+  );
 
   return res
     .status(200)
-    .json(new ApiResponse(200, comments, "Comments fetcched success"));
+    .json(new ApiResponse(200, withLikes, "Comments fetcched success"));
 });
 
 const addComment = asyncHandler(async (req, res) => {

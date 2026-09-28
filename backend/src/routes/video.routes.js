@@ -11,13 +11,17 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/").get(getAllVideos).post(publishAVideo);
+// Public reads — anyone can watch. Everything below verifyJWT needs login.
+router.route("/").get(getAllVideos);
+router.route("/:videoId").get(getVideoById);
+
+router.use(verifyJWT); // Apply verifyJWT middleware to all routes below
+
+router.route("/").post(publishAVideo);
 
 router
   .route("/:videoId")
-  .get(getVideoById)
   .delete(deleteVideo)
   .patch(updateVideo);
 

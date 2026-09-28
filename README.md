@@ -38,14 +38,14 @@ Built by **Prabhat Kumar** while learning backend development from
   emails can't be probed
 - Profile with cover/avatar, Settings (account, password, session), Help desk
 
-### Watching (real data after login)
+### Watching (100% live — zero mock data)
 
-- `/home` — logged-in members get the **live network feed**
-  (`GET /videos`, owners populated); guests get a preview catalog
-- `/video/:id` — real Cloudinary playback for network premieres
-  (ObjectId route), preview cards otherwise; like, share-copy, keep,
-  live comments
-- `/search?q=` — results across titles, channels, categories
+- `/home` — the **live network feed** for everyone (`GET /videos`, public,
+  owners populated); skeleton, retry and empty states, no fixtures
+- `/video/:id` — adaptive HLS player (auto + manual quality, speed,
+  fullscreen, shortcuts) streaming network premieres; real likes with live
+  counts, follow, Watch-Later keep, real comments with likes, real up-next
+- `/search?q=` — live results across titles, channels, descriptions
 - `/subscriptions` — followed channels with working unfollow
 - `/liked` (Applauded), `/library` (Collections/playlists)
 - `/profile` — real watch history (`GET /users/history`)
@@ -157,8 +157,9 @@ VITE_UPLOAD_PRESET=<preset>
 | POST   | `/api/v1/users/reset-password`        | –    | Set new password     |
 | GET    | `/api/v1/users/current-user`          | ✅   | Current user         |
 | GET    | `/api/v1/users/history`               | ✅   | Watch history        |
-| GET    | `/api/v1/videos?userId=&limit=`       | ✅   | Feed / channel videos|
-| GET    | `/api/v1/videos/:videoId`             | ✅   | Single video         |
+| GET    | `/api/v1/videos?userId=&limit=`       | – (public) | Feed / channel videos|
+| GET    | `/api/v1/videos/:videoId`             | – (public) | Single video (+counts, +1 view) |
+| GET    | `/api/v1/comments/:videoId`           | – (public) | Video comments (owners, likes) |
 | POST   | `/api/v1/videos`                      | ✅   | Publish video        |
 | GET    | `/api/v1/likes/videos`                | ✅   | Liked videos         |
 | POST   | `/api/v1/likes/toggle/v/:videoId`     | ✅   | Like/unlike          |

@@ -7,9 +7,9 @@
 ## Core pages
 
 - Landing: `/` — what PlayTube is, trending preview, signup entry
-- Feed: `/home` — category chips (Music, Coding, Design, Travel, Cooking,
-  Gaming, Podcasts, Live) and video cards with duration, views and age
-- Watch: `/video/:id` — player, subscribe, like, share, save, comments, up-next
+- Feed: `/home` — live public feed, no fixtures
+- Watch: `/video/:id` — HLS player (quality/speed/fullscreen), likes,
+  follow, Watch Later, comments, up-next — all live API data
 - Search: `/search?q=` — results across titles, channels and categories
 - Signup: `/signup` — full name, username, email, password, avatar + cover
 - Verify email: `/verify-otp` — 6-digit code, 30s resend, paste support

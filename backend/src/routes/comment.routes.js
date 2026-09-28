@@ -9,9 +9,12 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+// Reading comments is public; writing needs login.
+router.route("/:videoId").get(getVideoComments);
 
-router.route("/:videoId").get(getVideoComments).post(addComment);
+router.use(verifyJWT); // Apply verifyJWT middleware to all routes below
+
+router.route("/:videoId").post(addComment);
 router.route("/c/:commentId").delete(deleteComment).patch(updateComment);
 
 export default router;
