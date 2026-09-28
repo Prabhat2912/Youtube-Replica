@@ -7,4 +7,6 @@
   <url><loc>https://playtube.vercel.app/login</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://playtube.vercel.app/signup</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://playtube.vercel.app/verify-otp</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://playtube.vercel.app/shouts</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://playtube.vercel.app/help</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

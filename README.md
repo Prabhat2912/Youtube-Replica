@@ -36,7 +36,12 @@ Built by **Prabhat Kumar** while learning backend development from
 - **Forgot / reset password** (`/forgot-password`, `/reset-password?token=`)
   — single-use sha256-hashed tokens, 15-minute expiry, generic replies so
   emails can't be probed
-- Profile with cover/avatar, Settings (account, password, session), Help desk
+- Profile with cover/avatar, Settings (account, images, password, session),
+  Help desk
+- Dashboard doubles as studio: edit titles/descriptions, list/unlist,
+  delete premieres (owner-guarded); channel stats from `/dashboard/*`
+- Watch page: collection picker (file any premiere into any shelf),
+  follower counts, own-comment edit/delete
 
 ### Watching (100% live — zero mock data)
 
@@ -48,6 +53,9 @@ Built by **Prabhat Kumar** while learning backend development from
 - `/search?q=` — live results across titles, channels, descriptions
 - `/subscriptions` — followed channels with working unfollow
 - `/liked` (Applauded), `/library` (Collections/playlists)
+- `/library/:playlistId` — shelf detail: rename, pull premieres off, delete
+- `/channel/:username` — public rooms: cover, follower counts, follow toggle,
+  premieres + shouts
 - `/shouts` — backstage mic: post, edit, delete and like short notes;
   Latest (public) + Mine tabs, 280 chars
 - `/profile` — real watch history (`GET /users/history`)
@@ -158,10 +166,18 @@ VITE_UPLOAD_PRESET=<preset>
 | POST   | `/api/v1/users/forgot-password`       | –    | Send reset link      |
 | POST   | `/api/v1/users/reset-password`        | –    | Set new password     |
 | GET    | `/api/v1/users/current-user`          | ✅   | Current user         |
-| GET    | `/api/v1/users/history`               | ✅   | Watch history        |
+| GET    | `/api/v1/users/history`               | ✅   | Watch history          |
+| GET    | `/api/v1/users/c/:username`           | – (public) | Channel room     |
+| GET    | `/api/v1/dashboard/stats`             | ✅   | Channel stats          |
+| GET    | `/api/v1/dashboard/videos`            | ✅   | Channel uploads        |
 | GET    | `/api/v1/videos?userId=&limit=`       | – (public) | Feed / channel videos|
 | GET    | `/api/v1/videos/:videoId`             | – (public) | Single video (+counts, +1 view) |
+| PATCH  | `/api/v1/videos/:videoId`             | ✅   | Edit own premiere      |
+| DELETE | `/api/v1/videos/:videoId`             | ✅   | Delete own premiere    |
+| PATCH  | `/api/v1/videos/toggle/publish/:id`   | ✅   | List/unlist premiere   |
 | GET    | `/api/v1/comments/:videoId`           | – (public) | Video comments (owners, likes) |
+| PATCH  | `/api/v1/comments/c/:commentId`       | ✅   | Edit own comment       |
+| DELETE | `/api/v1/comments/c/:commentId`       | ✅   | Delete own comment     |
 | POST   | `/api/v1/videos`                      | ✅   | Publish video        |
 | GET    | `/api/v1/likes/videos`                | ✅   | Liked videos         |
 | POST   | `/api/v1/likes/toggle/v/:videoId`     | ✅   | Like/unlike          |

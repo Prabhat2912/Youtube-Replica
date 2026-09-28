@@ -22,6 +22,8 @@ import Settings from "./pages/Settings/settings";
 import Help from "./pages/Help/help";
 import Upload from "./pages/Upload/upload";
 import Shouts from "./pages/Shouts/shouts";
+import Channel from "./pages/Channel/channel";
+import PlaylistDetail from "./pages/Library/playlistDetail";
 import Login from "./components/Login/Login";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -63,6 +65,8 @@ const routes = (
       />
       <Route path="liked" element={<ProtectedRoute element={<Liked />} />} />
       <Route path="library" element={<ProtectedRoute element={<Library />} />} />
+      <Route path="library/:playlistId" element={<ProtectedRoute element={<PlaylistDetail />} />} />
+      <Route path="channel/:username" element={<Channel />} />
       <Route
         path="settings"
         element={<ProtectedRoute element={<Settings />} />}

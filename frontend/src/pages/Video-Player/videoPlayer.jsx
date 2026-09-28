@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FiThumbsUp, FiShare2, FiBookmark, FiCheck } from "react-icons/fi";
+import { FiThumbsUp, FiShare2, FiBookmark, FiCheck, FiPlus, FiEdit3, FiTrash2 } from "react-icons/fi";
 import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import Player from "../../components/Player/Player";
 import VideoCard, { formatViews } from "../../components/VideoCard/videoCard";
@@ -22,6 +22,7 @@ const VideoPlayer = () => {
   const [liked, setLiked] = useState(false);
   const [commentTotal, setCommentTotal] = useState(0);
   const [following, setFollowing] = useState(false);
+  const [followers, setFollowers] = useState(0);
   const [kept, setKept] = useState(false);
   const [shared, setShared] = useState(false);
   const [upNext, setUpNext] = useState([]);
@@ -29,6 +30,14 @@ const VideoPlayer = () => {
   const [comments, setComments] = useState([]);
   const [draft, setDraft] = useState("");
   const [posting, setPosting] = useState(false);
+  const [editingComment, setEditingComment] = useState(null);
+  const [editText, setEditText] = useState("");
+  const [confirmingComment, setConfirmingComment] = useState(null);
+
+  const [shelfOpen, setShelfOpen] = useState(false);
+  const [shelves, setShelves] = useState([]);
+  const [shelfBusy, setShelfBusy] = useState(null);
+  const [newShelf, setNewShelf] = useState("");
 
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
@@ -76,20 +85,21 @@ const VideoPlayer = () => {
       setCommentTotal(Number(data?.commentsCount || 0));
       setUpNext((Array.isArray(feed) ? feed : []).map(toCard).filter((v) => v.id !== id));
 
+      const ownerId = data?.owner?._id ? String(data.owner._id) : "";
       const [list, mine] = await Promise.all([
         feedApi.comments(id, { limit: 20 }).catch(() => []),
         isLogin
           ? Promise.all([
               feedApi.likedVideos().catch(() => []),
-              feedApi.subscriptions(user?._id).catch(() => null),
+              ownerId ? feedApi.subscriptions(user?._id).catch(() => null) : Promise.resolve(null),
+              ownerId ? feedApi.subscriberCount(ownerId).catch(() => 0) : Promise.resolve(0),
               feedApi.isKept(id).catch(() => ({ kept: false })),
             ])
-          : Promise.resolve([[], null, { kept: false }]),
+          : Promise.resolve([[], null, 0, { kept: false }]),
       ]);
       setComments(Array.isArray(list) ? list : []);
-      const [likedList, subs, keepState] = mine;
+      const [likedList, subs, count, keepState] = mine;
       setLiked((Array.isArray(likedList) ? likedList : []).some((v) => String(v?._id) === String(id)));
-      const ownerId = data?.owner?._id;
       setFollowing(
         Boolean(
           ownerId &&
@@ -98,6 +108,7 @@ const VideoPlayer = () => {
             )
         )
       );
+      setFollowers(Number(count) || 0);
       setKept(Boolean(keepState?.kept));
       setStatus("idle");
     } catch (err) {
@@ -111,6 +122,8 @@ const VideoPlayer = () => {
   }, [load]);
 
   const needLogin = () => navigate("/login");
+  const ownComment = (c) =>
+    isLogin && user?._id && String(c?.owner?._id || c?.owner) === String(user._id);
 
   const toggleLike = async () => {
     if (!isLogin) return needLogin();
@@ -132,10 +145,12 @@ const VideoPlayer = () => {
     if (!ownerId) return;
     const next = !following;
     setFollowing(next);
+    setFollowers((n) => Math.max(0, n + (next ? 1 : -1)));
     try {
       await feedApi.toggleSubscription(ownerId);
     } catch {
       setFollowing(!next);
+      setFollowers((n) => Math.max(0, n + (next ? -1 : 1)));
     }
   };
 
@@ -147,6 +162,57 @@ const VideoPlayer = () => {
       setKept(await feedApi.toggleKept(id));
     } catch {
       setKept(!next);
+    }
+  };
+
+  const openShelves = async () => {
+    if (!isLogin) return needLogin();
+    setShelfOpen(true);
+    try {
+      const mine = await feedApi.playlists(user?._id);
+      const withFlags = await Promise.all(
+        (Array.isArray(mine) ? mine : []).map(async (p) => {
+          try {
+            const full = await feedApi.playlistById(p._id);
+            const vids = Array.isArray(full?.videos) ? full.videos : [];
+            return { ...p, has: vids.some((v) => String(v?._id || v) === String(id)) };
+          } catch {
+            return { ...p, has: false };
+          }
+        })
+      );
+      setShelves(withFlags);
+    } catch (err) {
+      setError(serverMessage(err, "Could not open your shelves."));
+      setShelfOpen(false);
+    }
+  };
+
+  const flipShelf = async (playlistId, has) => {
+    setShelfBusy(playlistId);
+    try {
+      if (has) await feedApi.removeFromPlaylist(id, playlistId);
+      else await feedApi.addToPlaylist(id, playlistId);
+      setShelves((ss) => ss.map((s) => (s._id === playlistId ? { ...s, has: !has } : s)));
+    } catch (err) {
+      setError(serverMessage(err, "Could not update that shelf."));
+    } finally {
+      setShelfBusy(null);
+    }
+  };
+
+  const makeShelf = async (e) => {
+    e.preventDefault();
+    if (!newShelf.trim()) return;
+    try {
+      const pl = await feedApi.createPlaylist(newShelf.trim(), `Shelf for premieres like ${video?.title || "this one"}.`);
+      if (pl?._id) {
+        await feedApi.addToPlaylist(id, pl._id);
+        setShelves((ss) => [{ ...pl, has: true }, ...ss]);
+        setNewShelf("");
+      }
+    } catch (err) {
+      setError(serverMessage(err, "Could not create that shelf."));
     }
   };
 
@@ -179,9 +245,7 @@ const VideoPlayer = () => {
   const likeComment = async (commentId) => {
     if (!isLogin) return needLogin();
     setComments((cs) =>
-      cs.map((c) =>
-        c._id === commentId ? { ...c, likesCount: (c.likesCount || 0) + 1 } : c
-      )
+      cs.map((c) => (c._id === commentId ? { ...c, likesCount: (c.likesCount || 0) + 1 } : c))
     );
     try {
       const total = await feedApi.toggleCommentLike(commentId);
@@ -191,6 +255,33 @@ const VideoPlayer = () => {
     } catch {
       const list = await feedApi.comments(id, { limit: 20 }).catch(() => null);
       if (list) setComments(list);
+    }
+  };
+
+  const saveComment = async (commentId) => {
+    if (!editText.trim()) return;
+    try {
+      await feedApi.updateComment(commentId, editText.trim());
+      setComments((cs) => cs.map((c) => (c._id === commentId ? { ...c, content: editText.trim() } : c)));
+      setEditingComment(null);
+    } catch (err) {
+      setError(serverMessage(err, "Could not save that edit."));
+    }
+  };
+
+  const removeComment = async (commentId) => {
+    if (confirmingComment !== commentId) {
+      setConfirmingComment(commentId);
+      setTimeout(() => setConfirmingComment((c) => (c === commentId ? null : c)), 3000);
+      return;
+    }
+    setConfirmingComment(null);
+    try {
+      await feedApi.deleteComment(commentId);
+      setComments((cs) => cs.filter((c) => c._id !== commentId));
+      setCommentTotal((n) => Math.max(0, n - 1));
+    } catch (err) {
+      setError(serverMessage(err, "Could not delete that reaction."));
     }
   };
 
@@ -229,7 +320,9 @@ const VideoPlayer = () => {
               <img src={video.avatar} alt={video.channel} className="h-10 w-10 rounded-full" />
               <div>
                 <p className="text-sm font-bold text-zinc-100">{video.channel}</p>
-                <p className="text-[12.5px] text-zinc-500">{timeAgo(video.createdAt) || video.age}</p>
+                <p className="text-[12.5px] text-zinc-500">
+                  {followers.toLocaleString()} follower{followers === 1 ? "" : "s"} · {timeAgo(video.createdAt) || video.age}
+                </p>
               </div>
               <button
                 onClick={toggleFollow}
@@ -241,7 +334,7 @@ const VideoPlayer = () => {
                 {following ? "Following" : "Follow"}
               </button>
             </div>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex flex-wrap items-center gap-2">
               <button
                 onClick={toggleLike}
                 aria-pressed={liked}
@@ -262,6 +355,12 @@ const VideoPlayer = () => {
                 }`}
               >
                 <FiBookmark /> {kept ? "Kept" : "Keep"}
+              </button>
+              <button
+                onClick={openShelves}
+                className="flex h-10 items-center gap-1.5 rounded-full border border-line bg-panel px-4 text-sm font-bold text-zinc-300 hover:text-zinc-100"
+              >
+                <FiPlus /> Shelf it
               </button>
             </div>
           </div>
@@ -307,6 +406,7 @@ const VideoPlayer = () => {
               {comments.map((c) => {
                 const owner = c.owner && typeof c.owner === "object" ? c.owner : {};
                 const name = owner.fullName || owner.username || "Member";
+                const own = ownComment(c);
                 return (
                   <li key={c._id} className="flex gap-3">
                     <img
@@ -314,17 +414,59 @@ const VideoPlayer = () => {
                       alt={name}
                       className="h-9 w-9 shrink-0 rounded-full object-cover"
                     />
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-[13px] text-zinc-500">
                         <span className="font-bold text-zinc-200">{name}</span> {timeAgo(c.createdAt)}
                       </p>
-                      <p className="mt-0.5 text-sm leading-6 text-zinc-300">{c.content}</p>
-                      <button
-                        onClick={() => likeComment(c._id)}
-                        className="mt-1 inline-flex items-center gap-1.5 text-[12.5px] font-bold text-zinc-500 hover:text-ember"
-                      >
-                        <FiThumbsUp size={13} /> <span className="tabular-nums">{c.likesCount || 0}</span>
-                      </button>
+                      {editingComment === c._id ? (
+                        <div className="mt-1">
+                          <textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            rows={2}
+                            className="w-full rounded-xl border border-line bg-void p-2.5 text-sm text-zinc-100 outline-none focus:border-ember/60"
+                          />
+                          <div className="mt-1.5 flex justify-end gap-2">
+                            <button onClick={() => setEditingComment(null)} className="h-8 rounded-full px-3.5 text-[13px] font-bold text-zinc-500 hover:bg-white/5">
+                              Cancel
+                            </button>
+                            <button onClick={() => saveComment(c._id)} className="h-8 rounded-full bg-ember px-4 text-[13px] font-bold text-white hover:bg-ember-bright">
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="mt-0.5 text-sm leading-6 text-zinc-300">{c.content}</p>
+                      )}
+                      <div className="mt-1 flex items-center gap-3">
+                        <button
+                          onClick={() => likeComment(c._id)}
+                          className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-zinc-500 hover:text-ember"
+                        >
+                          <FiThumbsUp size={13} /> <span className="tabular-nums">{c.likesCount || 0}</span>
+                        </button>
+                        {own && editingComment !== c._id && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditingComment(c._id);
+                                setEditText(c.content);
+                              }}
+                              className="inline-flex items-center gap-1 text-[12.5px] font-bold text-zinc-500 hover:text-zinc-200"
+                            >
+                              <FiEdit3 size={12} /> Edit
+                            </button>
+                            <button
+                              onClick={() => removeComment(c._id)}
+                              className={`inline-flex items-center gap-1 text-[12.5px] font-bold transition ${
+                                confirmingComment === c._id ? "text-ember" : "text-zinc-500 hover:text-ember"
+                              }`}
+                            >
+                              <FiTrash2 size={12} /> {confirmingComment === c._id ? "Sure?" : "Delete"}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </li>
                 );
@@ -349,6 +491,53 @@ const VideoPlayer = () => {
           </Link>
         </aside>
       </div>
+
+      {shelfOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4" onClick={() => setShelfOpen(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-3xl border border-line bg-panel p-6">
+            <h3 className="font-display text-lg font-black text-zinc-100">Shelve this premiere</h3>
+            <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto">
+              {shelves.map((s) => (
+                <li key={s._id}>
+                  <button
+                    onClick={() => flipShelf(s._id, s.has)}
+                    disabled={shelfBusy === s._id}
+                    aria-pressed={s.has}
+                    className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-bold transition disabled:opacity-50 ${
+                      s.has ? "border-ember/60 bg-ember/10 text-ember" : "border-line text-zinc-200 hover:border-ember/40"
+                    }`}
+                  >
+                    <span className="truncate">{s.name}</span>
+                    <span>{shelfBusy === s._id ? "…" : s.has ? <FiCheck /> : <FiPlus />}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {!shelves.length && (
+              <p className="mt-4 text-sm text-zinc-500">No shelves yet — name your first below.</p>
+            )}
+            <form
+              onSubmit={makeShelf}
+              className="mt-4 flex gap-2"
+            >
+              <input
+                value={newShelf}
+                onChange={(e) => setNewShelf(e.target.value)}
+                placeholder="New shelf name"
+                maxLength={60}
+                aria-label="New shelf name"
+                className="h-11 min-w-0 flex-1 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none focus:border-ember/60"
+              />
+              <button type="submit" disabled={!newShelf.trim()} className="h-11 shrink-0 rounded-xl bg-ember px-4 text-sm font-bold text-white hover:bg-ember-bright disabled:opacity-50">
+                Add
+              </button>
+            </form>
+            <button onClick={() => setShelfOpen(false)} className="mt-3 w-full rounded-xl py-2.5 text-sm font-bold text-zinc-500 hover:bg-white/5">
+              Done
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -76,8 +76,15 @@ const updateComment = asyncHandler(async (req, res) => {
 
   const commenta = await Comment.findById(commentId);
 
+  if (!commenta) {
+    throw new ApiError(404, "Comment not found");
+  }
+  if (commenta.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You can only edit your own reactions.");
+  }
+
   commenta.content = content;
-  commenta.save();
+  await commenta.save();
 
   return res
     .status(200)
@@ -89,6 +96,14 @@ const deleteComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
   if (!commentId) {
     throw new ApiError(404, "Comment not found");
+  }
+
+  const comment = await Comment.findById(commentId);
+  if (!comment) {
+    throw new ApiError(404, "Comment not found");
+  }
+  if (comment.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You can only delete your own reactions.");
   }
 
   await Comment.findByIdAndDelete(commentId);

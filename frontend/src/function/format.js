@@ -50,5 +50,6 @@ export function toCard(v) {
     duration: fmtDuration(v?.duration),
     videoLink: `/video/${v?._id || v?.id || ""}`,
     createdAt: v?.createdAt,
+    published: v?.isPublished !== false,
   };
 }

@@ -54,7 +54,10 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Playlist not found");
   }
 
-  const playlist = await Playlist.findById(playlistId);
+  const playlist = await Playlist.findById(playlistId).populate({
+    path: "videos",
+    populate: { path: "owner", select: "fullName username avatar" },
+  });
 
   if (!playlist) {
     throw new ApiError(404, "playlist not found");
@@ -76,10 +79,20 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 
   const playlist = await Playlist.findById(playlistId);
 
+  if (!playlist) {
+    throw new ApiError(404, "Playlist not found");
+  }
+  if (playlist.owner.toString() !== userId.toString()) {
+    throw new ApiError(401, "You can only add to your own collections");
+  }
+
   const video = await Video.findById(videoId);
 
   if (!video) {
     throw new ApiError(404, "Video not Found");
+  }
+  if (playlist.videos.some((id) => id.toString() === videoId.toString())) {
+    throw new ApiError(400, "That premiere is already in this collection");
   }
 
   playlist.videos.push(videoId);

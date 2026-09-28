@@ -1,9 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FiPlay, FiArrowRight, FiShield, FiZap, FiFilm, FiRadio, FiStar } from "react-icons/fi";
 import Logo from "../../components/Brand/Logo";
+import Dropdown from "../../components/Dropdown/Dropdown";
+import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { feedApi } from "../../function/libraryApi";
 import { toCard } from "../../function/format";
@@ -27,8 +30,20 @@ const Bulbs = () => (
 
 const Landing = () => {
   const root = useRef(null);
+  const { isLogin, user } = useSelector(selectAuth);
   const [feed, setFeed] = useState([]);
   const [feedFailed, setFeedFailed] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    const close = (e) => {
+      if (!e.target.closest(".dropdown-trigger") && !e.target.closest(".dropdown-menu")) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
 
   // Live program for the marquee screen and rails — never fixtures.
   useEffect(() => {
@@ -155,12 +170,32 @@ const Landing = () => {
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
           <Logo />
           <div className="ml-auto flex items-center gap-2">
-            <Link to="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 hover:bg-white/5 hover:text-zinc-100">
-              Log in
-            </Link>
-            <Link to="/signup" className="magnetic rounded-full bg-ember px-5 py-2.5 text-sm font-bold text-white shadow-glow hover:bg-ember-bright">
-              Claim your seat
-            </Link>
+            {isLogin ? (
+              <>
+                <Link to="/home" className="hidden h-10 items-center rounded-full px-4 text-sm font-semibold text-zinc-400 hover:bg-white/5 hover:text-zinc-100 sm:flex">
+                  Home
+                </Link>
+                <div className="relative dropdown-trigger">
+                  <button onClick={() => setShowMenu((v) => !v)} aria-label="Account menu">
+                    <img
+                      src={user?.avatar || "https://api.dicebear.com/7.x/initials/svg?seed=You"}
+                      alt="Your profile"
+                      className="h-10 w-10 rounded-full border border-white/15 object-cover"
+                    />
+                  </button>
+                  <Dropdown isOpen={showMenu} />
+                </div>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-zinc-400 hover:bg-white/5 hover:text-zinc-100">
+                  Log in
+                </Link>
+                <Link to="/signup" className="magnetic rounded-full bg-ember px-5 py-2.5 text-sm font-bold text-white shadow-glow hover:bg-ember-bright">
+                  Claim your seat
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -187,14 +222,27 @@ const Landing = () => {
               verification. No noise, no doomscroll. Just the good stuff, on
               tonight.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link to="/signup" className="magnetic inline-flex items-center gap-2 rounded-full bg-ember px-8 py-3.5 text-[15px] font-bold text-white shadow-glow hover:bg-ember-bright">
-                Claim your seat <FiArrowRight />
-              </Link>
-              <Link to="/home" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-[15px] font-semibold text-zinc-100 backdrop-blur hover:border-white/30">
-                <FiPlay /> Sneak in as guest
-              </Link>
-            </div>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {isLogin ? (
+              <>
+                <Link to="/home" className="magnetic inline-flex items-center gap-2 rounded-full bg-ember px-8 py-3.5 text-[15px] font-bold text-white shadow-glow hover:bg-ember-bright">
+                  Enter the rooms <FiArrowRight />
+                </Link>
+                <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-[15px] font-semibold text-zinc-100 backdrop-blur hover:border-white/30">
+                  <FiPlay /> Your premieres
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/signup" className="magnetic inline-flex items-center gap-2 rounded-full bg-ember px-8 py-3.5 text-[15px] font-bold text-white shadow-glow hover:bg-ember-bright">
+                  Claim your seat <FiArrowRight />
+                </Link>
+                <Link to="/home" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-[15px] font-semibold text-zinc-100 backdrop-blur hover:border-white/30">
+                  <FiPlay /> Sneak in as guest
+                </Link>
+              </>
+            )}
+          </div>
           </div>
 
         <div data-parallax>
@@ -359,8 +407,8 @@ const Landing = () => {
             The doors open in thirty seconds. Bring a film.
           </h2>
           <div className="flex gap-3">
-            <Link to="/signup" className="magnetic inline-flex items-center rounded-full bg-void px-8 py-3.5 text-[15px] font-bold text-gold hover:bg-black">
-              Claim your seat
+            <Link to={isLogin ? "/home" : "/signup"} className="magnetic inline-flex items-center rounded-full bg-void px-8 py-3.5 text-[15px] font-bold text-gold hover:bg-black">
+              {isLogin ? "Enter the rooms" : "Claim your seat"}
             </Link>
             <Link to="/home" className="inline-flex items-center rounded-full border-2 border-void/70 px-8 py-3.5 text-[15px] font-bold text-void hover:border-void">
               Watch first

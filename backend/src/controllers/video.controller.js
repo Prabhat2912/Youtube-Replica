@@ -117,41 +117,40 @@ const getVideoById = asyncHandler(async (req, res) => {
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
-  //TODO: update video details like title, description, thumbnail
-  const { title, description } = req.body;
   const { videoId } = req.params;
+  const { title, description, thumbnail } = req.body || {};
 
-  if (![title, description].every(Boolean)) {
-    throw new ApiError(400, "All fields are required");
+  if (![title?.trim(), description?.trim()].every(Boolean)) {
+    throw new ApiError(400, "Title and description are required.");
   }
 
   if (!isValidObjectId(videoId)) {
     throw new ApiError(400, "Invalid videoId!");
   }
 
-  const thumbnail = req.body;
-
   const oldVideoDetails = await Video.findById(videoId);
 
   if (!oldVideoDetails) {
     throw new ApiError(404, "Video not found!");
   }
-
-  if (thumbnail) {
-    await deleteImageFromCloudinary(oldVideoDetails.thumbnail);
+  if (oldVideoDetails.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You can only edit your own premieres.");
   }
 
-  // if (thumbnailLocalPath) {
-  //   thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-  // }
-
-  // if (!thumbnail && thumbnailLocalPath) {
-  //   throw new ApiError(500, "Failed to upload thumbnail!, please try again");
-  // }
+  // Only replace the poster when the client sends a new one — the old
+  // code read req.body itself (always truthy) and wiped Cloudinary
+  // thumbnails on every edit.
+  if (thumbnail && thumbnail !== oldVideoDetails.thumbnail) {
+    try {
+      await deleteImageFromCloudinary(oldVideoDetails.thumbnail);
+    } catch (error) {
+      console.error("Error deleting thumbnail from Cloudinary:", error.message);
+    }
+  }
 
   const updateFields = {
-    title,
-    description,
+    title: title.trim(),
+    description: description.trim(),
   };
 
   if (thumbnail) {
@@ -160,7 +159,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
   const updatedVideo = await Video.findByIdAndUpdate(videoId, updateFields, {
     new: true,
-  });
+  }).populate("owner", "fullName username avatar");
 
   return res
     .status(200)
@@ -169,35 +168,21 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  try {
-    const video = await Video.findByIdAndDelete(videoId);
-    if (video.videoFile) {
-      try {
-        await deleteVideoFromCloudinary(video.videoFile);
-      } catch (error) {
-        console.error("Error deleting video from Cloudinary:", error.message);
-      }
-    }
-    if (video.thumbnail) {
-      try {
-        await deleteImageFromCloudinary(video.thumbnail);
-      } catch (error) {
-        console.error(
-          "Error deleting thumbnail from Cloudinary:",
-          error.message
-        );
-      }
-    }
-    return res
-      .status(200)
-      .json(new ApiResponse(200, "Video deleted succesfully "));
-  } catch (error) {
-    return res.json(error);
+
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid video id");
   }
 
-  //TODO: delete video
+  const video = await Video.findById(videoId);
+  if (!video) {
+    throw new ApiError(404, "Video not found");
+  }
+  if (video.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You can only delete your own premieres.");
+  }
 
-  const video = await Video.findByIdAndDelete(videoId);
+  await Video.findByIdAndDelete(videoId);
+
   if (video.videoFile) {
     try {
       await deleteVideoFromCloudinary(video.videoFile);
@@ -209,12 +194,15 @@ const deleteVideo = asyncHandler(async (req, res) => {
     try {
       await deleteImageFromCloudinary(video.thumbnail);
     } catch (error) {
-      console.error("Error deleting thumbnail from Cloudinary:", error.message);
+      console.error(
+        "Error deleting thumbnail from Cloudinary:",
+        error.message
+      );
     }
   }
   return res
     .status(200)
-    .json(new ApiResponse(200, "Video deleted succesfully "));
+    .json(new ApiResponse(200, {}, "Video deleted successfully"));
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
@@ -223,6 +211,9 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   const video = await Video.findById(videoId);
   if (!video) {
     throw new ApiError(404, "Video not found");
+  }
+  if (video.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You can only change your own premieres.");
   }
 
   video.isPublished = !video.isPublished;
