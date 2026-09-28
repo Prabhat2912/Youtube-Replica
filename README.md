@@ -25,6 +25,9 @@ Built by **Prabhat Kumar** while learning backend development from
 - GSAP throughout: cursor glow, magnetic CTAs, scroll reveals, scroll progress
 - SEO + AI-ready: meta/OG/Twitter cards, `WebSite` + per-video `VideoObject`
   JSON-LD, per-route titles, `robots.txt`, `sitemap.xml`, `llms.txt`
+- **Installable PWA**: standalone display, maskable icons, offline shell via
+  Workbox (app shell, fonts and media cached; API stays network-only),
+  prompted service-worker updates
 
 ### Accounts
 
