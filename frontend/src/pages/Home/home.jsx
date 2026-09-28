@@ -1,33 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
-import { feedApi, serverMessage } from "../../function/libraryApi";
-import { toCard } from "../../function/format";
+import { fetchFeed, selectLibrary } from "../../Redux/Features/Library/librarySlice";
 import { usePageMeta } from "../../function/pageMeta";
 
 const Home = () => {
-  const [live, setLive] = useState([]);
-  const [status, setStatus] = useState("loading");
-  const [error, setError] = useState(null);
-
+  const dispatch = useDispatch();
+  const { items, status, error } = useSelector(selectLibrary).feed;
   usePageMeta("Home feed", "Fresh premieres from across the PlayTube network.");
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    try {
-      const data = await feedApi.videos({ limit: 24, sortBy: "createdAt", sortType: "desc" });
-      setLive(Array.isArray(data) ? data.map(toCard) : []);
-      setStatus("idle");
-    } catch (err) {
-      setError(serverMessage(err, "Could not load the feed."));
-      setStatus("error");
-    }
-  }, []);
-
   useEffect(() => {
-    load();
-  }, [load]);
+    dispatch(fetchFeed());
+  }, [dispatch]);
 
   return (
     <div className="w-full overflow-y-auto bg-void">
@@ -36,10 +21,10 @@ const Home = () => {
         {status === "loading" ? (
           <CardsSkeleton />
         ) : status === "error" ? (
-          <FeedError message={error} onRetry={load} />
-        ) : live.length ? (
+          <FeedError message={error} onRetry={() => dispatch(fetchFeed({ force: true }))} />
+        ) : items.length ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {live.map((video) => (
+            {items.map((video) => (
               <VideoCard key={video.id} data={video} />
             ))}
           </div>

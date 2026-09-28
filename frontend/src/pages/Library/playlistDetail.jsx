@@ -1,17 +1,25 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { FiTrash2, FiEdit3 } from "react-icons/fi";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
-import { feedApi, serverMessage } from "../../function/libraryApi";
+import {
+  selectLibrary,
+  fetchPlaylistDetail,
+  renamePlaylist,
+  deletePlaylist,
+  toggleShelfVideo,
+} from "../../Redux/Features/Library/librarySlice";
 import { toCard } from "../../function/format";
 import { usePageMeta } from "../../function/pageMeta";
 
 const PlaylistDetail = () => {
   const { playlistId } = useParams();
   const navigate = useNavigate();
-  const [pl, setPl] = useState(null);
-  const [status, setStatus] = useState("loading");
+  const dispatch = useDispatch();
+  const bag = useSelector(selectLibrary).details[playlistId];
+  const pl = bag?.data || null;
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
@@ -25,69 +33,58 @@ const PlaylistDetail = () => {
     pl?.description || "A PlayTube collection of premieres."
   );
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    try {
-      const data = await feedApi.playlistById(playlistId);
-      if (!data?._id) throw new Error("That shelf doesn't exist.");
-      setPl(data);
-      setName(data.name || "");
-      setDescription(data.description || "");
-      setStatus("idle");
-    } catch (err) {
-      setError(serverMessage(err, "Could not open this shelf."));
-      setStatus("error");
-    }
-  }, [playlistId]);
+  useEffect(() => {
+    dispatch(fetchPlaylistDetail({ id: playlistId }))
+      .unwrap()
+      .then((d) => {
+        if (d && !d.cached) {
+          setName(d.data?.name || "");
+          setDescription(d.data?.description || "");
+        }
+      })
+      .catch((e) => setError(e));
+  }, [dispatch, playlistId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (pl && !name && !description) {
+      setName(pl.name || "");
+      setDescription(pl.description || "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pl?._id]);
 
-  const save = async (e) => {
+  const save = (e) => {
     e.preventDefault();
     if (!name.trim() || !description.trim() || saving) return;
     setSaving(true);
-    try {
-      const updated = await feedApi.updatePlaylist(playlistId, {
-        name: name.trim(),
-        description: description.trim(),
-      });
-      setPl(updated || { ...pl, name: name.trim(), description: description.trim() });
-      setEditing(false);
-    } catch (err) {
-      setError(serverMessage(err, "Could not save those changes."));
-    } finally {
-      setSaving(false);
-    }
+    dispatch(renamePlaylist({ id: playlistId, name: name.trim(), description: description.trim() }))
+      .unwrap()
+      .then(() => setEditing(false))
+      .catch((err) => setError(err))
+      .finally(() => setSaving(false));
   };
 
-  const pull = async (videoId) => {
+  const pull = (videoId) => {
     setBusy(videoId);
-    try {
-      await feedApi.removeFromPlaylist(videoId, playlistId);
-      setPl((p) => ({ ...p, videos: (p.videos || []).filter((v) => String(v?._id || v) !== String(videoId)) }));
-    } catch (err) {
-      setError(serverMessage(err, "Could not pull that premiere off the shelf."));
-    } finally {
-      setBusy(null);
-    }
+    dispatch(toggleShelfVideo({ videoId, playlistId, has: true }))
+      .unwrap()
+      .catch((err) => setError(err))
+      .finally(() => setBusy(null));
   };
 
-  const destroy = async () => {
+  const destroy = () => {
     if (confirming !== playlistId) {
       setConfirming(playlistId);
       setTimeout(() => setConfirming(null), 3000);
       return;
     }
-    try {
-      await feedApi.deletePlaylist(playlistId);
-      navigate("/library", { replace: true });
-    } catch (err) {
-      setError(serverMessage(err, "Could not delete this shelf."));
-      setConfirming(null);
-    }
+    dispatch(deletePlaylist({ id: playlistId }))
+      .unwrap()
+      .then(() => navigate("/library", { replace: true }))
+      .catch((err) => {
+        setError(err);
+        setConfirming(null);
+      });
   };
 
   const videos = Array.isArray(pl?.videos) ? pl.videos : [];
@@ -96,13 +93,15 @@ const PlaylistDetail = () => {
     <div className="w-full overflow-y-auto bg-void px-4 py-6 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <Link to="/library" className="text-sm font-bold text-zinc-500 hover:text-ember">← All collections</Link>
-        {status === "loading" ? (
-          <div className="mt-4">
-            <div className="h-8 w-64 animate-pulse rounded bg-white/5" />
-            <div className="mt-5"><CardsSkeleton count={4} /></div>
-          </div>
-        ) : status === "error" || !pl ? (
-          <div className="mt-4"><FeedError message={error} onRetry={load} /></div>
+        {!pl ? (
+          error ? (
+            <div className="mt-4"><FeedError message={error} onRetry={() => dispatch(fetchPlaylistDetail({ id: playlistId, force: true })).unwrap().catch((e) => setError(e))} /></div>
+          ) : (
+            <div className="mt-4">
+              <div className="h-8 w-64 animate-pulse rounded bg-white/5" />
+              <div className="mt-5"><CardsSkeleton count={4} /></div>
+            </div>
+          )
         ) : (
           <>
             <div className="mt-3 flex flex-wrap items-start justify-between gap-4">

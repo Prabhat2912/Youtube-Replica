@@ -1,22 +1,23 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FiThumbsUp } from "react-icons/fi";
 import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import { selectLibrary, fetchChannelRoom, toggleFollow } from "../../Redux/Features/Library/librarySlice";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
-import { feedApi, serverMessage } from "../../function/libraryApi";
-import { toCard, timeAgo } from "../../function/format";
+import { timeAgo } from "../../function/format";
 import { usePageMeta } from "../../function/pageMeta";
 
 const Channel = () => {
   const { username } = useParams();
   const { isLogin, user } = useSelector(selectAuth);
-  const [room, setRoom] = useState(null);
-  const [videos, setVideos] = useState([]);
-  const [shouts, setShouts] = useState([]);
-  const [following, setFollowing] = useState(false);
-  const [status, setStatus] = useState("loading");
+  const dispatch = useDispatch();
+  const cached = useSelector(selectLibrary).rooms[username];
+  const subsList = useSelector(selectLibrary).subs.list;
+  const room = cached?.room || null;
+  const videos = cached?.videos || [];
+  const shouts = cached?.shouts || [];
   const [error, setError] = useState(null);
 
   usePageMeta(
@@ -24,56 +25,41 @@ const Channel = () => {
     room ? `Premieres, shouts and rooms from ${room.fullName} on PlayTube.` : "Channel on PlayTube."
   );
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    try {
-      // Channel rooms are members-only (backend requires auth here).
-      const data = await feedApi.channel(username);
-      setRoom(data);
-      setFollowing(Boolean(data?.isSubscribed));
-      const [vids, shts] = await Promise.all([
-        feedApi.videos({ userId: data?._id, limit: 24 }).catch(() => []),
-        feedApi.userTweets(data?._id).catch(() => []),
-      ]);
-      setVideos(Array.isArray(vids) ? vids.map(toCard) : []);
-      setShouts(Array.isArray(shts) ? shts.slice(0, 5) : []);
-      setStatus("idle");
-    } catch (err) {
-      setError(serverMessage(err, "Could not open this room."));
-      setStatus("error");
-    }
-  }, [username]);
-
   useEffect(() => {
-    load();
-  }, [load]);
+    setError(null);
+    dispatch(fetchChannelRoom({ username }))
+      .unwrap()
+      .catch((e) => setError(e));
+  }, [dispatch, username]);
 
-  const toggleFollow = async () => {
+  const following = room?._id
+    ? subsList.some((s) => String(s?.channel?._id || s?.channel) === String(room._id))
+      || (Boolean(room.isSubscribed) && !subsList.length)
+    : false;
+
+  const toggle = () => {
     if (!room?._id) return;
-    const next = !following;
-    setFollowing(next);
-    try {
-      await feedApi.toggleSubscription(room._id);
-      setRoom((r) => (r ? { ...r, subscribersCount: Math.max(0, (r.subscribersCount || 0) + (next ? 1 : -1)) } : r));
-    } catch {
-      setFollowing(!next);
-    }
+    dispatch(toggleFollow({ ownerId: room._id }))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchChannelRoom({ username, force: true })).unwrap().catch(() => {});
+      })
+      .catch(() => {});
   };
 
   const ownRoom = isLogin && user?._id && room?._id && String(user._id) === String(room._id);
 
   return (
     <div className="w-full overflow-y-auto bg-void">
-      {status === "loading" ? (
+      {(!cached && !error) || (!cached && !room) ? (
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
           <div className="h-36 animate-pulse rounded-3xl bg-white/5 sm:h-44" />
           <div className="mt-4 h-8 w-64 animate-pulse rounded bg-white/5" />
           <div className="mt-6"><CardsSkeleton count={4} /></div>
         </div>
-      ) : status === "error" || !room ? (
+      ) : error || !room ? (
         <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-          <FeedError message={error} onRetry={load} />
+          <FeedError message={error} onRetry={() => dispatch(fetchChannelRoom({ username, force: true })).unwrap().then(() => setError(null)).catch((e) => setError(e))} />
         </div>
       ) : (
         <>
@@ -100,7 +86,7 @@ const Channel = () => {
                   </Link>
                 ) : (
                   <button
-                    onClick={toggleFollow}
+                    onClick={toggle}
                     aria-pressed={following}
                     className={`h-10 rounded-full px-6 text-sm font-bold transition ${
                       following ? "border border-line text-zinc-300 hover:border-ember/50" : "bg-ember text-white hover:bg-ember-bright"

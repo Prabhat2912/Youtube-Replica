@@ -1,49 +1,44 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { FiTrash2, FiPlus } from "react-icons/fi";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
-import { feedApi, serverMessage } from "../../function/libraryApi";
-import { toCard } from "../../function/format";
+import {
+  selectLibrary,
+  fetchLiked,
+  ensurePlaylists,
+  createPlaylist,
+  deletePlaylist,
+} from "../../Redux/Features/Library/librarySlice";
 import { usePageMeta } from "../../function/pageMeta";
 
 const shell = "w-full overflow-y-auto bg-void px-4 py-6 sm:px-6";
 
 export const Liked = () => {
-  usePageMeta("Liked premieres", "Every PlayTube video you applauded, in one place.");
-  const [list, setList] = useState([]);
-  const [status, setStatus] = useState("loading");
+  const dispatch = useDispatch();
+  const liked = useSelector(selectLibrary).liked;
   const [error, setError] = useState(null);
-
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    try {
-      const data = await feedApi.likedVideos();
-      setList(Array.isArray(data) ? data.map(toCard) : []);
-      setStatus("idle");
-    } catch (err) {
-      setError(serverMessage(err, "Could not load your applauded list."));
-      setStatus("error");
-    }
-  }, []);
+  usePageMeta("Liked premieres", "Every PlayTube video you applauded, in one place.");
 
   useEffect(() => {
-    load();
-  }, [load]);
+    dispatch(fetchLiked()).unwrap().catch((e) => setError(e));
+  }, [dispatch]);
+
+  const loading = !liked.updatedAt && !liked.items && !error;
 
   return (
     <div className={shell}>
       <h1 className="font-display text-2xl font-black tracking-tight text-zinc-100">Applauded</h1>
       <p className="mt-1 text-sm text-zinc-500">Every premiere you reacted to.</p>
       <div className="mt-5">
-        {status === "loading" ? (
+        {loading ? (
           <CardsSkeleton />
-        ) : status === "error" ? (
-          <FeedError message={error} onRetry={load} />
-        ) : list.length ? (
+        ) : error && !liked.items?.length ? (
+          <FeedError message={error} onRetry={() => dispatch(fetchLiked({ force: true })).unwrap().then(() => setError(null)).catch((e) => setError(e))} />
+        ) : liked.items?.length ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {list.map((v) => (
+            {liked.items.map((v) => (
               <VideoCard key={v.id} data={v} />
             ))}
           </div>
@@ -61,9 +56,11 @@ export const Liked = () => {
 };
 
 export const Library = () => {
+  const dispatch = useDispatch();
+  const playlists = useSelector(selectLibrary).playlists;
   usePageMeta("Collections", "Your PlayTube collections and saved premieres.");
-  const [list, setList] = useState([]);
-  const [status, setStatus] = useState("loading");
+  const list = playlists.list;
+  const [status, setStatus] = useState(playlists.updatedAt ? "idle" : "loading");
   const [error, setError] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -71,42 +68,32 @@ export const Library = () => {
   const [busy, setBusy] = useState(null);
   const [confirming, setConfirming] = useState(null);
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    try {
-      const userId = JSON.parse(localStorage.getItem("user") || "{}")?._id;
-      if (!userId) throw new Error("Log in again to load your collections.");
-      const data = await feedApi.playlists(userId);
-      setList(Array.isArray(data) ? data : []);
-      setStatus("idle");
-    } catch (err) {
-      setError(serverMessage(err, "Could not load your collections."));
-      setStatus("error");
-    }
-  }, []);
-
   useEffect(() => {
-    load();
-  }, [load]);
+    dispatch(ensurePlaylists())
+      .unwrap()
+      .then(() => setStatus("idle"))
+      .catch((e) => {
+        setError(e);
+        setStatus("error");
+      });
+  }, [dispatch]);
 
-  const create = async (e) => {
+  const create = (e) => {
     e.preventDefault();
     if (!name.trim() || !description.trim() || creating) return;
     setCreating(true);
-    try {
-      const pl = await feedApi.createPlaylist(name.trim(), description.trim());
-      if (pl?._id) setList((ls) => [pl, ...ls]);
-      setName("");
-      setDescription("");
-    } catch (err) {
-      setError(serverMessage(err, "Could not create that collection."));
-    } finally {
-      setCreating(false);
-    }
+    dispatch(createPlaylist({ name: name.trim(), description: description.trim() }))
+      .unwrap()
+      .then(() => {
+        setName("");
+        setDescription("");
+        setError(null);
+      })
+      .catch((err) => setError(err))
+      .finally(() => setCreating(false));
   };
 
-  const remove = async (playlistId) => {
+  const remove = (playlistId) => {
     if (confirming !== playlistId) {
       setConfirming(playlistId);
       setTimeout(() => setConfirming((c) => (c === playlistId ? null : c)), 3000);
@@ -114,14 +101,10 @@ export const Library = () => {
     }
     setConfirming(null);
     setBusy(playlistId);
-    try {
-      await feedApi.deletePlaylist(playlistId);
-      setList((ls) => ls.filter((p) => p._id !== playlistId));
-    } catch (err) {
-      setError(serverMessage(err, "Could not delete that collection."));
-    } finally {
-      setBusy(null);
-    }
+    dispatch(deletePlaylist({ id: playlistId }))
+      .unwrap()
+      .catch((err) => setError(err))
+      .finally(() => setBusy(null));
   };
 
   return (
@@ -163,7 +146,7 @@ export const Library = () => {
         {status === "loading" ? (
           <CardsSkeleton count={4} />
         ) : status === "error" && !list.length ? (
-          <FeedError message={error} onRetry={load} />
+          <FeedError message={error} onRetry={() => dispatch(ensurePlaylists()).unwrap().then(() => { setStatus("idle"); setError(null); }).catch((e) => setError(e))} />
         ) : list.length ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((p) => (

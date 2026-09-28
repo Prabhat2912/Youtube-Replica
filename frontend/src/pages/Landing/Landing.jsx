@@ -1,15 +1,14 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FiPlay, FiArrowRight, FiShield, FiZap, FiFilm, FiRadio, FiStar } from "react-icons/fi";
 import Logo from "../../components/Brand/Logo";
 import Dropdown from "../../components/Dropdown/Dropdown";
 import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import { selectLibrary, fetchFeed } from "../../Redux/Features/Library/librarySlice";
 import VideoCard from "../../components/VideoCard/videoCard";
-import { feedApi } from "../../function/libraryApi";
-import { toCard } from "../../function/format";
 import { usePageMeta } from "../../function/pageMeta";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -30,10 +29,18 @@ const Bulbs = () => (
 
 const Landing = () => {
   const root = useRef(null);
+  const dispatch = useDispatch();
   const { isLogin, user } = useSelector(selectAuth);
-  const [feed, setFeed] = useState([]);
-  const [feedFailed, setFeedFailed] = useState(false);
+  const feed = useSelector(selectLibrary).feed;
   const [showMenu, setShowMenu] = useState(false);
+
+  // Rails read the shared feed cache — no second fetch after visiting home.
+  useEffect(() => {
+    dispatch(fetchFeed());
+  }, [dispatch]);
+
+  const featured = feed.items[0];
+  const feedFailed = feed.status === "error";
 
   useEffect(() => {
     const close = (e) => {
@@ -46,22 +53,7 @@ const Landing = () => {
   }, []);
 
   // Live program for the marquee screen and rails — never fixtures.
-  useEffect(() => {
-    let live = true;
-    feedApi
-      .videos({ limit: 8, sortBy: "createdAt", sortType: "desc" })
-      .then((data) => {
-        if (live) setFeed(Array.isArray(data) ? data.map(toCard) : []);
-      })
-      .catch(() => {
-        if (live) setFeedFailed(true);
-      });
-    return () => {
-      live = false;
-    };
-  }, []);
-
-  const featured = feed[0];
+  // (reads the shared Redux feed cache; see above)
 
   usePageMeta(
     "A lighter home for video",
@@ -366,12 +358,12 @@ const Landing = () => {
               </Link>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {feed.slice(0, 4).map((v) => (
+              {feed.items.slice(0, 4).map((v) => (
                 <Link key={v.id} to={v.videoLink} aria-label={v.title}>
                   <img src={v.thumbnail} alt="" loading="lazy" className="aspect-video w-full rounded-xl border border-white/10 object-cover transition hover:border-ember/50" />
                 </Link>
               ))}
-              {!feed.length && (
+              {!feed.items.length && (
                 <p className="col-span-2 text-sm text-zinc-500 sm:col-span-4">
                   {feedFailed ? "Creator premieres will line up here once the network answers." : "Loading premieres…"}
                 </p>
@@ -382,7 +374,7 @@ const Landing = () => {
       </section>
 
       {/* Now showing rail — live network premieres only */}
-      {feed.length > 0 && (
+      {feed.items.length > 0 && (
       <section data-reveal className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-3xl font-black tracking-tight">Now showing</h2>
@@ -391,7 +383,7 @@ const Landing = () => {
           </Link>
         </div>
         <div className="scroll-hidden -mx-4 mt-7 flex gap-5 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6">
-          {feed.slice(0, 6).map((v) => (
+          {feed.items.slice(0, 6).map((v) => (
             <div key={v.id} className="w-64 shrink-0 sm:w-72">
               <VideoCard data={v} />
             </div>

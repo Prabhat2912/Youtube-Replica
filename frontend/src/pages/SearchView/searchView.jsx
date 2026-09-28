@@ -1,53 +1,35 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { CardsSkeleton, FeedError } from "../../components/FeedStates/FeedStates";
-import { feedApi, serverMessage } from "../../function/libraryApi";
-import { toCard } from "../../function/format";
+import { selectLibrary, fetchFeed } from "../../Redux/Features/Library/librarySlice";
 import { usePageMeta } from "../../function/pageMeta";
 
 const SearchView = () => {
   const [params] = useSearchParams();
   const raw = params.get("q") || "";
   const q = raw.toLowerCase();
+  const dispatch = useDispatch();
+  const feed = useSelector(selectLibrary).feed;
   usePageMeta(
     q ? `Results for ${raw}` : "Explore",
     "Search PlayTube videos, channels and topics."
   );
 
-  const [all, setAll] = useState([]);
-  const [status, setStatus] = useState("loading");
-  const [error, setError] = useState(null);
-
   useEffect(() => {
-    let live = true;
-    setStatus("loading");
-    feedApi
-      .videos({ limit: 50, sortBy: "createdAt", sortType: "desc" })
-      .then((data) => {
-        if (!live) return;
-        setAll(Array.isArray(data) ? data.map(toCard) : []);
-        setStatus("idle");
-      })
-      .catch((err) => {
-        if (!live) return;
-        setError(serverMessage(err, "Search is down right now."));
-        setStatus("error");
-      });
-    return () => {
-      live = false;
-    };
-  }, []);
+    dispatch(fetchFeed());
+  }, [dispatch]);
 
   const results = useMemo(() => {
-    if (!q) return all;
-    return all.filter(
+    if (!q) return feed.items;
+    return feed.items.filter(
       (v) =>
         v.title.toLowerCase().includes(q) ||
         v.channel.toLowerCase().includes(q) ||
         (v.description || "").toLowerCase().includes(q)
     );
-  }, [q, all]);
+  }, [q, feed.items]);
 
   return (
     <div className="w-full overflow-y-auto bg-void px-4 py-6 sm:px-6">
@@ -59,10 +41,10 @@ const SearchView = () => {
         )}
       </h1>
       <p className="mt-1 text-sm text-zinc-500">{results.length} screening{results.length === 1 ? "" : "s"} on the network</p>
-      {status === "loading" ? (
+      {feed.status === "loading" ? (
         <div className="mt-5"><CardsSkeleton /></div>
-      ) : status === "error" ? (
-        <div className="mt-5"><FeedError message={error} onRetry={() => window.location.reload()} /></div>
+      ) : feed.status === "error" ? (
+        <div className="mt-5"><FeedError message={feed.error} onRetry={() => dispatch(fetchFeed({ force: true }))} /></div>
       ) : results.length ? (
         <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((v) => (

@@ -79,6 +79,11 @@ Built by **Prabhat Kumar** while learning backend development from
 | Layer    | Tech                                                              |
 | -------- | ----------------------------------------------------------------- |
 | Frontend | React 18, Vite 8, Tailwind CSS, Redux Toolkit, React Router, GSAP |
+
+Reads go through a Redux Toolkit cache (`library` slice, ~4min TTL):
+feed, video rooms, comments, likes, subs, playlists, history, dashboard,
+tweets and channels load once and survive navigation; mutations patch the
+cache with server-count reconciliation and rollback on failure.
 | Backend  | Node.js, Express 4, MongoDB + Mongoose, JWT, bcryptjs, nodemailer |
 | Media    | Cloudinary (uploads, thumbnails, playback)                        |
 | Deploy   | Vercel (frontend static + backend serverless function)            |

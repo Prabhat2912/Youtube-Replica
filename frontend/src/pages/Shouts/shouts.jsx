@@ -1,21 +1,22 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FiThumbsUp, FiTrash2, FiEdit3 } from "react-icons/fi";
 import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
-import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
+import { selectLibrary, fetchTweets } from "../../Redux/Features/Library/librarySlice";
 import { feedApi, serverMessage } from "../../function/libraryApi";
+import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
 import { timeAgo } from "../../function/format";
 import { usePageMeta } from "../../function/pageMeta";
 
 const Shouts = () => {
   const { isLogin, user } = useSelector(selectAuth);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const tweets = useSelector(selectLibrary).tweets;
   usePageMeta("Shouts", "Short backstage notes from across the PlayTube network.");
 
   const [tab, setTab] = useState("latest"); // latest | mine
-  const [list, setList] = useState([]);
-  const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
 
   const [draft, setDraft] = useState("");
@@ -25,62 +26,50 @@ const Shouts = () => {
   const [confirming, setConfirming] = useState(null); // tweetId
   const [busy, setBusy] = useState(null);
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    try {
-      const data =
-        tab === "mine"
-          ? await feedApi.userTweets(user?._id || JSON.parse(localStorage.getItem("user") || "{}")?._id)
-          : await feedApi.latestTweets();
-      setList(Array.isArray(data) ? data : []);
-      setStatus("idle");
-    } catch (err) {
-      setError(serverMessage(err, "Could not load shouts."));
-      setStatus("error");
-    }
-  }, [tab, user?._id]);
+  const list = tab === "mine" ? tweets.mine : tweets.latest;
+  const stamped = tab === "mine" ? tweets.updatedAtMine : tweets.updatedAtLatest;
+  const loading = !stamped && !error && !list.length;
 
   useEffect(() => {
     if (tab === "mine" && !isLogin) {
       navigate("/login", { replace: true });
       return;
     }
-    load();
-  }, [tab, isLogin, load, navigate]);
+    setError(null);
+    dispatch(fetchTweets({ tab })).unwrap().catch((e) => setError(e));
+  }, [tab, isLogin, dispatch, navigate]);
 
-  const shout = async (e) => {
+  const refresh = () => dispatch(fetchTweets({ tab, force: true })).unwrap().catch((e) => setError(e));
+
+  const shout = (e) => {
     e.preventDefault();
     if (!draft.trim() || posting) return;
     setPosting(true);
-    try {
-      await feedApi.createTweet(draft.trim());
-      setDraft("");
-      await load();
-      setTab("mine");
-    } catch (err) {
-      setError(serverMessage(err, "Could not post that shout."));
-      setStatus("error");
-    } finally {
-      setPosting(false);
-    }
+    feedApi
+      .createTweet(draft.trim())
+      .then(() => {
+        setDraft("");
+        setTab("mine");
+        return dispatch(fetchTweets({ tab: "mine", force: true })).unwrap();
+      })
+      .catch((err) => setError(serverMessage(err, "Could not post that shout.")))
+      .finally(() => setPosting(false));
   };
 
-  const saveEdit = async (tweetId) => {
+  const saveEdit = (tweetId) => {
     if (!editText.trim()) return;
     setBusy(tweetId);
-    try {
-      await feedApi.updateTweet(tweetId, editText.trim());
-      setEditing(null);
-      await load();
-    } catch (err) {
-      setError(serverMessage(err, "Could not save that edit."));
-    } finally {
-      setBusy(null);
-    }
+    feedApi
+      .updateTweet(tweetId, editText.trim())
+      .then(() => {
+        setEditing(null);
+        return dispatch(fetchTweets({ tab, force: true })).unwrap();
+      })
+      .catch((err) => setError(serverMessage(err, "Could not save that edit.")))
+      .finally(() => setBusy(null));
   };
 
-  const remove = async (tweetId) => {
+  const remove = (tweetId) => {
     if (confirming !== tweetId) {
       setConfirming(tweetId);
       setTimeout(() => setConfirming((c) => (c === tweetId ? null : c)), 3000);
@@ -88,29 +77,18 @@ const Shouts = () => {
     }
     setConfirming(null);
     setBusy(tweetId);
-    try {
-      await feedApi.deleteTweet(tweetId);
-      setList((ls) => ls.filter((t) => t._id !== tweetId));
-    } catch (err) {
-      setError(serverMessage(err, "Could not delete that shout."));
-    } finally {
-      setBusy(null);
-    }
+    feedApi
+      .deleteTweet(tweetId)
+      .then(() => dispatch(fetchTweets({ tab, force: true })).unwrap())
+      .catch((err) => setError(serverMessage(err, "Could not delete that shout.")))
+      .finally(() => setBusy(null));
   };
 
-  const like = async (tweetId) => {
+  const like = (tweetId) => {
     if (!isLogin) return navigate("/login");
-    setList((ls) =>
-      ls.map((t) => (t._id === tweetId ? { ...t, likesCount: (t.likesCount || 0) + 1 } : t))
-    );
-    try {
-      const total = await feedApi.toggleTweetLike(tweetId);
-      setList((ls) =>
-        ls.map((t) => (t._id === tweetId ? { ...t, likesCount: typeof total === "number" ? total : t.likesCount } : t))
-      );
-    } catch {
-      load();
-    }
+    feedApi.toggleTweetLike(tweetId).then(() => {
+      dispatch(fetchTweets({ tab, force: true })).unwrap().catch(() => {});
+    });
   };
 
   const mine = (t) =>
@@ -167,11 +145,14 @@ const Shouts = () => {
           </form>
         )}
 
+        {!!error && !!list.length && (
+          <p role="alert" className="mb-3 rounded-2xl border border-ember/40 bg-ember/5 p-3 text-sm text-ember-bright">{error}</p>
+        )}
         <div className="mt-4">
-          {status === "loading" ? (
+          {loading ? (
             <CardsSkeleton count={4} />
-          ) : status === "error" ? (
-            <FeedError message={error} onRetry={load} />
+          ) : error && !list.length ? (
+            <FeedError message={error} onRetry={refresh} />
           ) : list.length ? (
             <ul className="space-y-3">
               {list.map((t) => {

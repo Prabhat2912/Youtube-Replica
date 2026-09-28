@@ -83,6 +83,9 @@ const Player = ({ src, poster, title }) => {
       h.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) useMp4();
       });
+      h.on(Hls.Events.LEVEL_LOADED, () => {
+        if (h.media) syncDur(h.media.duration);
+      });
       h.loadSource(url);
       h.attachMedia(el);
     } else if (url && el.canPlayType("application/vnd.apple.mpegurl")) {
@@ -110,6 +113,12 @@ const Player = ({ src, poster, title }) => {
     setMenu(null);
   };
 
+  // Duration from HLS manifests arrives in pieces (first report is often
+  // a stub like 4s). Only ever grow it, and never show less than elapsed.
+  const syncDur = useCallback((d) => {
+    if (isFinite(d) && d > 0) setDur((prev) => Math.max(prev, d));
+  }, []);
+
   const toggle = useCallback(() => {
     const el = video.current;
     if (!el) return;
@@ -119,7 +128,7 @@ const Player = ({ src, poster, title }) => {
 
   const seek = (v) => {
     const el = video.current;
-    if (el && dur) el.currentTime = (v / 1000) * dur;
+    if (el && shown) el.currentTime = (v / 1000) * shown;
   };
 
   const full = () => {
@@ -150,6 +159,9 @@ const Player = ({ src, poster, title }) => {
   const menuBtn =
     "flex w-full items-center justify-between px-4 py-2 text-[13px] hover:bg-white/10";
 
+  // Never display less total than already played (kills 0:34/0:04).
+  const shown = Math.max(dur, time);
+
   return (
     <div
       ref={wrap}
@@ -167,7 +179,8 @@ const Player = ({ src, poster, title }) => {
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onTimeUpdate={(e) => setTime(e.target.currentTime)}
-        onLoadedMetadata={(e) => setDur(e.target.duration)}
+        onLoadedMetadata={(e) => syncDur(e.target.duration)}
+        onDurationChange={(e) => syncDur(e.target.duration)}
         onWaiting={() => setWaiting(true)}
         onPlaying={() => setWaiting(false)}
         onCanPlay={() => setWaiting(false)}
@@ -208,20 +221,20 @@ const Player = ({ src, poster, title }) => {
         <div className="relative mb-2 h-1.5 overflow-hidden rounded-full bg-white/20">
           <div
             className="absolute inset-y-0 left-0 bg-white/30"
-            style={{ width: dur ? `${(buffered / dur) * 100}%` : 0 }}
+            style={{ width: shown ? `${(buffered / shown) * 100}%` : 0 }}
           />
           <input
             type="range"
             min={0}
             max={1000}
-            value={dur ? (time / dur) * 1000 : 0}
+            value={shown ? (time / shown) * 1000 : 0}
             onChange={(e) => seek(Number(e.target.value))}
             aria-label="Seek"
             className="absolute inset-0 w-full cursor-pointer opacity-0"
           />
           <div
             className="absolute inset-y-0 left-0 bg-ember"
-            style={{ width: dur ? `${(time / dur) * 100}%` : 0 }}
+            style={{ width: shown ? `${(time / shown) * 100}%` : 0 }}
           />
         </div>
 
@@ -254,7 +267,7 @@ const Player = ({ src, poster, title }) => {
             className="hidden h-1 w-20 accent-[#FF4D2E] sm:block"
           />
           <span className="ml-1 text-[12.5px] tabular-nums text-zinc-300">
-            {fmt(time)} / {fmt(dur)}
+            {fmt(time)} / {fmt(shown)}
           </span>
           <span className="ml-1 hidden rounded bg-white/15 px-1.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-zinc-200 sm:block">
             {mode === "hls" ? (quality === -1 ? "Auto" : levels.find((l) => l.id === quality)?.label) : "Original"}
