@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --volt: #00e5ff;
-  --blaze: #ff5a1f;
-  --void: #0a0a0f;
+  --ember: #ff4d2e;
+  --gold: #ffb800;
+  --void: #0c0a09;
 }
 
 html {
@@ -20,23 +20,23 @@ body {
 }
 
 ::selection {
-  background: #00e5ff;
-  color: #0a0a0f;
+  background: #ff4d2e;
+  color: #0c0a09;
 }
 
 :focus-visible {
-  outline: 2px solid #00e5ff;
+  outline: 2px solid #ff4d2e;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
 input,
 textarea {
-  caret-color: #00e5ff;
+  caret-color: #ff4d2e;
 }
 
 input::placeholder {
-  color: #52525b;
+  color: #57534e;
   opacity: 1;
 }
 
@@ -45,15 +45,15 @@ input::placeholder {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0f;
+  background: #0c0a09;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2e2e38;
+  background: #33291f;
   border-radius: 8px;
-  border: 2px solid #0a0a0f;
+  border: 2px solid #0c0a09;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f4c;
+  background: #4a3a2a;
 }
 
 .scroll-hidden {
@@ -72,7 +72,7 @@ input::placeholder {
 }
 
 .otp-box {
-  caret-color: #00e5ff;
+  caret-color: #ff4d2e;
   font-variant-numeric: tabular-nums;
 }
 .otp-box:disabled {
@@ -88,7 +88,17 @@ input::placeholder {
   scale: 2.4;
 }
 
-/* The one authored motion: the marquee tape. Everything else stays still. */
+/* Film grain — the difference between flat-black and cinema-black */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+/* The one authored motion family: marquee tape, entrance rise, bulbs */
 @keyframes marquee-x {
   from {
     transform: translateX(0);
@@ -121,7 +131,7 @@ input::placeholder {
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 8px 1px rgb(0 229 255 / 0.7);
+    box-shadow: 0 0 8px 1px rgb(255 184 0 / 0.7);
   }
   50% {
     opacity: 0.25;
@@ -133,10 +143,25 @@ input::placeholder {
   animation: bulb-twinkle 2.1s ease-in-out infinite;
 }
 
+@keyframes rec-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.rec-dot {
+  animation: rec-blink 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
   .rise,
-  .bulb {
+  .bulb,
+  .rec-dot {
     animation: none;
   }
 }

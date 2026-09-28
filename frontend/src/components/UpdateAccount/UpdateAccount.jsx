@@ -52,7 +52,7 @@ const UpdateAccount = ({ isModalOpen }) => {
       >
         <input
           type="text"
-          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
+          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           placeholder="Enter full name"
           onChange={(e) => {
             setData({ ...data, fullName: e.target.value });
@@ -60,7 +60,7 @@ const UpdateAccount = ({ isModalOpen }) => {
         />
         <input
           type="email"
-          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
+          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           placeholder="Enter new email"
           onChange={(e) => {
             setData({ ...data, email: e.target.value });
@@ -68,7 +68,7 @@ const UpdateAccount = ({ isModalOpen }) => {
         />
         <button
           type="submit"
-          className="grid h-11 place-items-center rounded-xl bg-volt text-sm font-bold text-void transition hover:bg-volt-bright disabled:opacity-60"
+          className="grid h-11 place-items-center rounded-xl bg-ember text-sm font-bold text-void transition hover:bg-ember-bright disabled:opacity-60"
           onClick={handleAccountUpdate}
         >
           {profileState.isLoading ? (

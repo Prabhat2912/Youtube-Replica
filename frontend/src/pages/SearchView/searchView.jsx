@@ -25,7 +25,7 @@ const SearchView = () => {
     <div className="w-full overflow-y-auto bg-void px-4 py-6 sm:px-6">
       <h1 className="text-xl font-black tracking-tight text-zinc-100">
         {q ? (
-          <>Results for <span className="text-volt">“{params.get("q")}”</span></>
+          <>Results for <span className="text-ember">“{params.get("q")}”</span></>
         ) : (
           "Explore everything"
         )}
@@ -41,7 +41,7 @@ const SearchView = () => {
         <div className="mt-8 rounded-2xl border border-line bg-panel p-10 text-center">
           <p className="font-bold text-zinc-100">No matches for “{params.get("q")}”.</p>
           <p className="mt-1 text-sm text-zinc-500">Try a channel name, topic or category.</p>
-          <Link to="/home" className="mt-4 inline-block rounded-full bg-volt px-6 py-2.5 text-sm font-bold text-void">Back to the program</Link>
+          <Link to="/home" className="mt-4 inline-block rounded-full bg-ember px-6 py-2.5 text-sm font-bold text-void">Back to the program</Link>
         </div>
       )}
     </div>

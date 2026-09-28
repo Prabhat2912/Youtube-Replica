@@ -7,7 +7,7 @@ import BASE_URL from "../../../BaseURL";
 import { usePageMeta } from "../../function/pageMeta";
 
 const field =
-  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15";
+  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15";
 
 const ResetPassword = () => {
   const [params] = useSearchParams();
@@ -48,20 +48,20 @@ const ResetPassword = () => {
             <p className="mt-2 text-sm leading-6 text-zinc-500">
               Open the reset link straight from your email, or ask for a fresh one.
             </p>
-            <Link to="/forgot-password" className="mt-6 block rounded-xl bg-volt py-3.5 text-center text-[15px] font-bold text-void hover:bg-volt-bright">
+            <Link to="/forgot-password" className="mt-6 block rounded-xl bg-ember py-3.5 text-center text-[15px] font-bold text-void hover:bg-ember-bright">
               Get a fresh link
             </Link>
           </div>
         ) : status === "done" ? (
           <div className="mt-5 text-center">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-volt/10 text-volt">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ember/10 text-ember">
               <FiCheck size={24} />
             </span>
             <h1 className="mt-4 text-2xl font-black tracking-tight text-zinc-100">Password updated</h1>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
               Your new password is live. Take your seat again.
             </p>
-            <Link to="/login" className="mt-6 block rounded-xl bg-volt py-3.5 text-center text-[15px] font-bold text-void hover:bg-volt-bright">
+            <Link to="/login" className="mt-6 block rounded-xl bg-ember py-3.5 text-center text-[15px] font-bold text-void hover:bg-ember-bright">
               Log in
             </Link>
           </div>
@@ -80,12 +80,12 @@ const ResetPassword = () => {
                 <span className="mb-1.5 block text-sm font-bold text-zinc-300">Repeat it</span>
                 <input type="password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="••••••••" autoComplete="new-password" className={field} />
               </label>
-              {mismatch && <p role="alert" className="text-sm text-blaze-hot">The two passwords don't match yet.</p>}
-              {error && <p role="alert" className="text-sm text-blaze-hot">{error}</p>}
+              {mismatch && <p role="alert" className="text-sm text-gold-hot">The two passwords don't match yet.</p>}
+              {error && <p role="alert" className="text-sm text-gold-hot">{error}</p>}
               <button
                 type="submit"
                 disabled={status === "saving" || pw.length < 8 || mismatch}
-                className="h-12 w-full rounded-xl bg-volt text-[15px] font-bold text-void transition hover:bg-volt-bright disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 w-full rounded-xl bg-ember text-[15px] font-bold text-void transition hover:bg-ember-bright disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {status === "saving" ? "Updating…" : "Update password"}
               </button>

@@ -53,11 +53,11 @@ const Header = ({ onMenuClick }) => {
             type="search"
             placeholder="Search films, channels, moods"
             aria-label="Search videos"
-            className="h-11 w-full rounded-full border border-line bg-panel pl-11 pr-24 text-sm text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
+            className="h-11 w-full rounded-full border border-line bg-panel pl-11 pr-24 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           />
           <button
             type="submit"
-            className="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-volt px-4 text-sm font-bold text-void hover:bg-volt-bright"
+            className="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-ember px-4 text-sm font-bold text-void hover:bg-ember-bright"
           >
             Search
           </button>
@@ -91,7 +91,7 @@ const Header = ({ onMenuClick }) => {
             </Link>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="h-10 rounded-full bg-volt px-5 text-sm font-bold text-void shadow-glow hover:bg-volt-bright"
+              className="h-10 rounded-full bg-ember px-5 text-sm font-bold text-void shadow-glow hover:bg-ember-bright"
             >
               Get started
             </button>

@@ -57,7 +57,7 @@ const routes = (
       <Route path="video/:id" element={<VideoPlayer />} />
       {/* legacy alias */}
       <Route path="video" element={<VideoPlayer />} />
-      <Route path="*" element={<div className="p-10 text-center text-zinc-500">This reel is blank — <a className="font-bold text-volt" href="/home">back to the program</a></div>} />
+      <Route path="*" element={<div className="p-10 text-center text-zinc-500">This reel is blank — <a className="font-bold text-ember" href="/home">back to the program</a></div>} />
     </Route>
   </Route>
 );

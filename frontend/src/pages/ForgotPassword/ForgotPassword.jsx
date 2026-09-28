@@ -32,7 +32,7 @@ const ForgotPassword = () => {
         <div className="flex justify-center"><Logo /></div>
         {status === "sent" ? (
           <div className="mt-5 text-center">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-volt/10 text-volt">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ember/10 text-ember">
               <FiCheck size={24} />
             </span>
             <h1 className="mt-4 text-2xl font-black tracking-tight text-zinc-100">Check your inbox</h1>
@@ -41,7 +41,7 @@ const ForgotPassword = () => {
               account, a reset link is on its way. It works once and expires in
               15 minutes.
             </p>
-            <Link to="/login" className="mt-6 block rounded-xl bg-volt py-3.5 text-center text-[15px] font-bold text-void hover:bg-volt-bright">
+            <Link to="/login" className="mt-6 block rounded-xl bg-ember py-3.5 text-center text-[15px] font-bold text-void hover:bg-ember-bright">
               Back to log in
             </Link>
           </div>
@@ -62,21 +62,21 @@ const ForgotPassword = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="h-12 w-full rounded-xl border border-line bg-void pl-10 pr-4 text-[15px] text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
+                    className="h-12 w-full rounded-xl border border-line bg-void pl-10 pr-4 text-[15px] text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
                   />
                 </span>
               </label>
-              {error && <p role="alert" className="text-sm text-blaze-hot">{error}</p>}
+              {error && <p role="alert" className="text-sm text-gold-hot">{error}</p>}
               <button
                 type="submit"
                 disabled={status === "sending" || !email}
-                className="h-12 w-full rounded-xl bg-volt text-[15px] font-bold text-void transition hover:bg-volt-bright disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 w-full rounded-xl bg-ember text-[15px] font-bold text-void transition hover:bg-ember-bright disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {status === "sending" ? "Sending…" : "Send reset link"}
               </button>
             </form>
             <p className="mt-6 text-center text-[13px] text-zinc-500">
-              Remembered it? <Link to="/login" className="font-bold text-volt hover:text-volt-bright">Log in</Link>
+              Remembered it? <Link to="/login" className="font-bold text-ember hover:text-ember-bright">Log in</Link>
             </p>
           </>
         )}

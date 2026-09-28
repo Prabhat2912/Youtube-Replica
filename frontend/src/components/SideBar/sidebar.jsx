@@ -8,7 +8,7 @@ import { BiHelpCircle } from "react-icons/bi";
 const linkCls = ({ isActive }) =>
   `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
     isActive
-      ? "bg-volt font-bold text-void"
+      ? "bg-ember font-bold text-void"
       : "text-zinc-400 hover:bg-panel hover:text-zinc-100"
   }`;
 
@@ -43,7 +43,7 @@ const Sidebar = ({ collapsed }) => (
     {!collapsed && (
       <div className="rounded-2xl border border-line bg-panel p-4 text-[13px] leading-5 text-zinc-400">
         <p className="font-bold text-zinc-100">
-          First night at <span className="text-volt">playtube</span>?
+          First night at <span className="text-ember">playtube</span>?
         </p>
         <p className="mt-1">Verify your email to premiere, comment and collect.</p>
       </div>

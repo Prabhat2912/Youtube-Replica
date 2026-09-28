@@ -47,7 +47,7 @@ const PasswordChange = ({ isModalOpen }) => {
       >
         <input
           type="password"
-          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
+          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           placeholder="Enter old password"
           onChange={(e) => {
             setPass({ ...pass, oldPassword: e.target.value });
@@ -55,7 +55,7 @@ const PasswordChange = ({ isModalOpen }) => {
         />
         <input
           type="password"
-          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
+          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           placeholder="Enter new password"
           onChange={(e) => {
             setPass({ ...pass, newPassword: e.target.value });
@@ -63,7 +63,7 @@ const PasswordChange = ({ isModalOpen }) => {
         />
         <button
           type="submit"
-          className="grid h-11 place-items-center rounded-xl bg-volt text-sm font-bold text-void transition hover:bg-volt-bright disabled:opacity-60"
+          className="grid h-11 place-items-center rounded-xl bg-ember text-sm font-bold text-void transition hover:bg-ember-bright disabled:opacity-60"
           onClick={handlePassChange}
         >
           {profileState.isLoading ? (

@@ -13,7 +13,7 @@ import Logo from "../Brand/Logo";
 import { usePageMeta } from "../../function/pageMeta";
 
 const field =
-  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15";
+  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15";
 
 const SignUp = () => {
   const [data, setData] = useState({
@@ -115,14 +115,14 @@ const SignUp = () => {
           <label className="block">
             <span className="mb-1.5 block text-sm font-bold text-zinc-300">Avatar</span>
             <input type="file" accept="image/*"
-              className="w-full rounded-xl border border-dashed border-line bg-void px-3 py-2.5 text-sm text-zinc-400 file:mr-2 file:rounded-lg file:border-0 file:bg-volt file:px-3 file:py-1.5 file:font-bold file:text-void"
+              className="w-full rounded-xl border border-dashed border-line bg-void px-3 py-2.5 text-sm text-zinc-400 file:mr-2 file:rounded-lg file:border-0 file:bg-ember file:px-3 file:py-1.5 file:font-bold file:text-void"
               onChange={(e) => { setImages({ ...images, avatarFile: e.target.files[0] }); handleImageChange(e, "avatar"); }} />
             {preview?.avatar && <img alt="Avatar preview" src={preview.avatar} className="mt-2 h-14 w-14 rounded-full object-cover" />}
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-bold text-zinc-300">Cover image</span>
             <input type="file" accept="image/*"
-              className="w-full rounded-xl border border-dashed border-line bg-void px-3 py-2.5 text-sm text-zinc-400 file:mr-2 file:rounded-lg file:border-0 file:bg-volt file:px-3 file:py-1.5 file:font-bold file:text-void"
+              className="w-full rounded-xl border border-dashed border-line bg-void px-3 py-2.5 text-sm text-zinc-400 file:mr-2 file:rounded-lg file:border-0 file:bg-ember file:px-3 file:py-1.5 file:font-bold file:text-void"
               onChange={(e) => { setImages({ ...images, coverImageFile: e.target.files[0] }); handleImageChange(e, "coverImage"); }} />
             {preview?.coverImage && <img alt="Cover preview" src={preview.coverImage} className="mt-2 h-14 w-full rounded-lg object-cover" />}
           </label>
@@ -130,13 +130,13 @@ const SignUp = () => {
 
         <button
           type="submit"
-          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-volt text-[15px] font-bold text-void transition hover:bg-volt-bright disabled:opacity-60"
+          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-ember text-[15px] font-bold text-void transition hover:bg-ember-bright disabled:opacity-60"
           disabled={authState.isLoading}
         >
           {authState.isLoading ? <ScaleLoader loading color="#0A0A0F" height={20} /> : "Claim seat"}
         </button>
         <p className="mt-4 text-center text-sm text-zinc-500">
-          Have a ticket? <Link to="/login" className="font-bold text-volt hover:text-volt-bright">Log in</Link>
+          Have a ticket? <Link to="/login" className="font-bold text-ember hover:text-ember-bright">Log in</Link>
         </p>
       </form>
     </div>

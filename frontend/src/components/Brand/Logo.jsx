@@ -9,17 +9,17 @@ export const PlayMark = ({ size = 36 }) => (
     fill="none"
     aria-hidden="true"
   >
-    <rect width="48" height="48" rx="14" fill="#00E5FF" />
-    <path d="M15 17v14l12-7-12-7Z" fill="#0A0A0F" />
+    <defs>
+      <linearGradient id="pt-sunset" x1="0" y1="0" x2="48" y2="48">
+        <stop offset="0" stopColor="#FFB800" />
+        <stop offset="1" stopColor="#FF4D2E" />
+      </linearGradient>
+    </defs>
+    <rect width="48" height="48" rx="15" fill="url(#pt-sunset)" />
+    <path d="M17 16.5v15l13-7.5-13-7.5Z" fill="#0C0A09" />
     <path
-      d="M29 14.5a14 14 0 0 1 0 19"
-      stroke="#0A0A0F"
-      strokeWidth="3"
-      strokeLinecap="round"
-    />
-    <path
-      d="M34 10.5a20 20 0 0 1 0 27"
-      stroke="#FF5A1F"
+      d="M31 15a13 13 0 0 1 0 18"
+      stroke="#FFF7ED"
       strokeWidth="3"
       strokeLinecap="round"
     />
@@ -34,9 +34,9 @@ const Logo = ({ compact = false }) => (
   >
     <PlayMark />
     {!compact && (
-      <span className="text-[20px] font-extrabold lowercase leading-none tracking-tight">
+      <span className="font-display text-[17px] font-extrabold lowercase leading-none tracking-tight">
         <span className="text-zinc-100">play</span>
-        <span className="text-volt">tube</span>
+        <span className="text-ember">tube</span>
       </span>
     )}
   </Link>

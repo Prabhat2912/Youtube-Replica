@@ -4,24 +4,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: "#0A0A0F",
-        panel: "#14141C",
-        line: "#26262F",
-        volt: {
-          DEFAULT: "#00E5FF",
-          bright: "#7DF4FF",
-          dim: "#0E9DB8",
+        void: "#0C0A09",
+        panel: "#171310",
+        line: "#2B221B",
+        ember: {
+          DEFAULT: "#FF4D2E",
+          bright: "#FF7A59",
+          dim: "#B4280F",
         },
-        blaze: {
-          DEFAULT: "#FF5A1F",
-          hot: "#FF6E3D",
+        gold: {
+          DEFAULT: "#FFB800",
+          bright: "#FFD34D",
+          dim: "#9A6B00",
         },
         brand: {
-          50: "#f7fee7",
-          100: "#ecfccb",
-          500: "#a3e635",
-          600: "#65a30d",
-          700: "#4d7c0f",
+          50: "#fff7ed",
+          100: "#ffedd5",
+          500: "#f97316",
+          600: "#ea580c",
+          700: "#c2410e",
         },
       },
       fontFamily: {
@@ -34,11 +35,12 @@ export default {
           "Roboto",
           "sans-serif",
         ],
+        display: ["Unbounded", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 0 rgb(255 255 255 / 0.04), 0 16px 40px -20px rgb(0 0 0 / 0.8)",
-        glow: "0 0 28px -6px rgb(0 229 255 / 0.5)",
-        glowblaze: "0 0 28px -6px rgb(255 90 31 / 0.55)",
+        card: "0 1px 0 rgb(255 255 255 / 0.05), 0 24px 60px -24px rgb(0 0 0 / 0.9)",
+        glow: "0 0 32px -6px rgb(255 77 46 / 0.55)",
+        glowgold: "0 0 32px -6px rgb(255 184 0 / 0.5)",
       },
     },
   },

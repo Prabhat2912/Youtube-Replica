@@ -10,7 +10,7 @@ export function formatViews(views) {
 const VideoCard = ({ data }) => (
   <Link
     to={data.videoLink}
-    className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition duration-200 hover:-translate-y-1 hover:border-volt/50 hover:shadow-glow"
+    className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition duration-200 hover:-translate-y-1 hover:border-ember/50 hover:shadow-glow"
   >
     <div className="relative aspect-video overflow-hidden bg-black">
       <img
@@ -19,11 +19,11 @@ const VideoCard = ({ data }) => (
         loading="lazy"
         className="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.04] group-hover:opacity-100"
       />
-      <span className="absolute bottom-2 right-2 rounded-md bg-blaze px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-white">
+      <span className="absolute bottom-2 right-2 rounded-md bg-gold px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-white">
         {data.duration}
       </span>
       <span className="absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100">
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-volt text-void">
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-ember text-void">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M8 5.5v13l11-6.5-11-6.5Z" />
           </svg>

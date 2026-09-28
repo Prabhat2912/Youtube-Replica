@@ -8,7 +8,7 @@ import Logo from "../Brand/Logo";
 import { usePageMeta } from "../../function/pageMeta";
 
 const field =
-  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15";
+  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15";
 
 const Login = ({ isModalOpen }) => {
   const [data, setData] = useState({ username: "", email: "", password: "" });
@@ -71,7 +71,7 @@ const Login = ({ isModalOpen }) => {
         <label className="mt-4 block">
           <span className="mb-1.5 flex items-center justify-between text-sm font-bold text-zinc-300">
             Password
-            <Link to="/forgot-password" className="font-bold text-volt hover:text-volt-bright">Forgot ticket?</Link>
+            <Link to="/forgot-password" className="font-bold text-ember hover:text-ember-bright">Forgot ticket?</Link>
           </span>
           <input
             type="password"
@@ -83,16 +83,16 @@ const Login = ({ isModalOpen }) => {
         </label>
         <button
           type="submit"
-          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-volt text-[15px] font-bold text-void transition hover:bg-volt-bright disabled:opacity-60"
+          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-ember text-[15px] font-bold text-void transition hover:bg-ember-bright disabled:opacity-60"
           disabled={authState.isLoading}
         >
           {authState.isLoading ? <ScaleLoader loading color="#0A0A0F" height={20} /> : "Take your seat"}
         </button>
         <p className="mt-4 text-center text-sm text-zinc-500">
           New here?{" "}
-          <Link to="/signup" className="font-bold text-volt hover:text-volt-bright">Claim a seat</Link>
+          <Link to="/signup" className="font-bold text-ember hover:text-ember-bright">Claim a seat</Link>
           {" · "}
-          <Link to="/verify-otp" className="font-bold text-volt hover:text-volt-bright">Verify email</Link>
+          <Link to="/verify-otp" className="font-bold text-ember hover:text-ember-bright">Verify email</Link>
         </p>
       </form>
     </div>

@@ -27,7 +27,7 @@ const Dashboard = () => {
           { icon: <FiUpload />, label: "Premieres", value: String(videos.length) },
         ].map((s) => (
           <div key={s.label} className={stat}>
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-volt/10 text-volt">{s.icon}</span>
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-ember/10 text-ember">{s.icon}</span>
             <p className="mt-3 text-2xl font-black tabular-nums tracking-tight text-zinc-100">{s.value}</p>
             <p className="text-[13px] text-zinc-500">{s.label}</p>
           </div>
@@ -36,7 +36,7 @@ const Dashboard = () => {
 
       <div className="mt-6 flex items-center justify-between">
         <h2 className="text-lg font-black tracking-tight text-zinc-100">Your premieres</h2>
-        <button className="inline-flex h-10 items-center gap-2 rounded-full bg-volt px-5 text-sm font-bold text-void hover:bg-volt-bright">
+        <button className="inline-flex h-10 items-center gap-2 rounded-full bg-ember px-5 text-sm font-bold text-void hover:bg-ember-bright">
           <FiUpload /> New premiere
         </button>
       </div>
@@ -46,7 +46,7 @@ const Dashboard = () => {
         ))}
       </div>
       <p className="mt-6 text-sm text-zinc-500">
-        Looking for collections? <Link to="/profile" className="font-bold text-volt">Open your library</Link>
+        Looking for collections? <Link to="/profile" className="font-bold text-ember">Open your library</Link>
       </p>
     </div>
   );

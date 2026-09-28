@@ -29,7 +29,7 @@ export const sendOtpMail = async (to, code) => {
     <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;border:1px solid #e7e5e4;border-radius:16px;">
       <h2 style="color:#0f172a;margin:0 0 8px;">Your PlayTube code</h2>
       <p style="color:#64748b;font-size:14px;">Enter this 6-digit code to verify your email. It expires in 10 minutes.</p>
-      <div style="font-size:32px;font-weight:800;letter-spacing:8px;color:#ea580c;text-align:center;padding:16px;background:#fff7ed;border-radius:12px;margin:16px 0;">${code}</div>
+      <div style="font-size:32px;font-weight:800;letter-spacing:8px;color:#FF4D2E;text-align:center;padding:16px;background:#fff7ed;border-radius:12px;margin:16px 0;">${code}</div>
       <p style="color:#94a3b8;font-size:12px;">Didn't ask for this? Ignore the email — nothing changes.</p>
     </div>
   `;
@@ -48,7 +48,7 @@ export const sendResetMail = async (to, link) => {
     <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;border:1px solid #e7e5e4;border-radius:16px;">
       <h2 style="color:#0f172a;margin:0 0 8px;">Reset your PlayTube password</h2>
       <p style="color:#64748b;font-size:14px;">Someone asked for a new password on this email. The link below works once and expires in 15 minutes.</p>
-      <a href="${link}" style="display:block;text-align:center;font-size:15px;font-weight:700;color:#ffffff;background:#ea580c;border-radius:12px;padding:14px;margin:16px 0;text-decoration:none;">Set a new password</a>
+      <a href="${link}" style="display:block;text-align:center;font-size:15px;font-weight:700;color:#ffffff;background:#FF4D2E;border-radius:12px;padding:14px;margin:16px 0;text-decoration:none;">Set a new password</a>
       <p style="color:#94a3b8;font-size:12px;">Wasn't you? Ignore this email — your password stays exactly as it is.</p>
     </div>
   `;

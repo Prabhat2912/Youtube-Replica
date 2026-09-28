@@ -46,7 +46,7 @@ const Dropdown = ({ isOpen }) => {
         ))}
       </div>
       <button
-        className="mt-2 w-full rounded-xl border border-line p-2.5 text-sm font-bold text-blaze-hot hover:border-blaze"
+        className="mt-2 w-full rounded-xl border border-line p-2.5 text-sm font-bold text-gold-bright hover:border-gold"
         onClick={handleLogout}
       >
         Log out
