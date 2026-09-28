@@ -10,6 +10,7 @@ import { uploadToCloudinary, autoFrame } from "../../function/cloudinaryUpload";
 import { usePageMeta } from "../../function/pageMeta";
 
 const stepWrap = "rounded-3xl border border-line bg-panel p-6 sm:p-7";
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100MB CDN cap
 
 const Upload = () => {
   const navigate = useNavigate();
@@ -35,6 +36,12 @@ const Upload = () => {
 
   const pickVideo = async (f) => {
     if (!f) return;
+    if (f.size > MAX_VIDEO_BYTES) {
+      setError(
+        `That file is ${(f.size / 1048576).toFixed(1)}MB — keep uploads under 100MB. Compress it or trim a clip and try again.`
+      );
+      return;
+    }
     setFile(f);
     setError(null);
     setUploading(true);
@@ -112,6 +119,15 @@ const Upload = () => {
         </p>
         <h1 className="mt-3 font-display text-3xl font-black tracking-tight text-zinc-100">New premiere</h1>
         <p className="mt-1 text-sm text-zinc-500">Upload once — your film streams straight from the CDN.</p>
+
+        <div role="note" aria-label="Upload size limit" className="mt-4 flex items-start gap-3 rounded-2xl border border-gold/40 bg-gold/10 p-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold font-display text-base font-black text-void">!</span>
+          <p className="text-sm leading-6 text-zinc-200">
+            <span className="font-bold text-gold">Heads up:</span> keep your video
+            under <span className="font-bold">100MB</span>. Anything larger gets
+            rejected — compress it or trim a shorter cut before uploading.
+          </p>
+        </div>
 
         <form onSubmit={publish} className="mt-6 space-y-5">
           <section className={stepWrap} aria-label="Video file">
