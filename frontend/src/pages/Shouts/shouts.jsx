@@ -6,6 +6,7 @@ import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import { selectLibrary, fetchTweets } from "../../Redux/Features/Library/librarySlice";
 import { feedApi, serverMessage } from "../../function/libraryApi";
 import { CardsSkeleton, FeedEmpty, FeedError } from "../../components/FeedStates/FeedStates";
+import Tabs from "../../components/Tabs/Tabs";
 import { timeAgo } from "../../function/format";
 import { usePageMeta } from "../../function/pageMeta";
 
@@ -103,22 +104,8 @@ const Shouts = () => {
         <h1 className="mt-3 font-display text-3xl font-black tracking-tight text-zinc-100">Shouts</h1>
         <p className="mt-1 text-sm text-zinc-500">Short notes from the rooms — drops, polls, premiere dates.</p>
 
-        <div className="mt-5 flex gap-2">
-          {[
-            ["latest", "Latest"],
-            ["mine", "My shouts"],
-          ].map(([id, label]) => (
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              aria-pressed={tab === id}
-              className={`h-10 rounded-full px-5 text-sm font-bold transition ${
-                tab === id ? "bg-ember text-white" : "border border-line bg-panel text-zinc-400 hover:text-zinc-100"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="mt-5">
+          <Tabs tabs={[["latest", "Latest"], ["mine", "My shouts"]]} active={tab} onChange={setTab} />
         </div>
 
         {isLogin && (
@@ -148,7 +135,7 @@ const Shouts = () => {
         {!!error && !!list.length && (
           <p role="alert" className="mb-3 rounded-2xl border border-ember/40 bg-ember/5 p-3 text-sm text-ember-bright">{error}</p>
         )}
-        <div className="mt-4">
+        <div key={tab} className="tab-panel mt-4">
           {loading ? (
             <CardsSkeleton count={4} />
           ) : error && !list.length ? (

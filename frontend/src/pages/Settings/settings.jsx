@@ -5,6 +5,7 @@ import { logout, selectAuth, setUser } from "../../Redux/Features/Auth/AuthSlice
 import { resetLibrary } from "../../Redux/Features/Library/librarySlice";
 import UpdateAccount from "../../components/UpdateAccount/UpdateAccount";
 import PasswordChange from "../../components/PasswordChange/PasswordChange";
+import Tabs from "../../components/Tabs/Tabs";
 import { feedApi, serverMessage } from "../../function/libraryApi";
 import { uploadToCloudinary } from "../../function/cloudinaryUpload";
 import { usePageMeta } from "../../function/pageMeta";
@@ -50,27 +51,15 @@ const Settings = () => {
         Signed in as <span className="font-bold text-zinc-300">{user?.fullName || user?.username}</span>
       </p>
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {[
-          ["account", "Account"],
-          ["images", "Images"],
-          ["password", "Password"],
-          ["session", "Session"],
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            aria-pressed={tab === id}
-            className={`h-10 rounded-full px-5 text-sm font-bold transition ${
-              tab === id ? "bg-ember text-white" : "border border-line bg-panel text-zinc-400 hover:text-zinc-100"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mt-5">
+        <Tabs
+          tabs={[["account", "Account"], ["images", "Images"], ["password", "Password"], ["session", "Session"]]}
+          active={tab}
+          onChange={setTab}
+        />
       </div>
 
-      <div className="mt-5 max-w-lg rounded-3xl border border-line bg-panel p-6">
+      <div key={tab} className="tab-panel mt-5 max-w-lg rounded-3xl border border-line bg-panel p-6">
         {tab === "account" && <UpdateAccount isModalOpen={() => {}} />}
         {tab === "images" && (
           <div className="space-y-5">
