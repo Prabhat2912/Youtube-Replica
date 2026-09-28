@@ -3,9 +3,14 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 cloudinary.config({
-  cloud_name: process.env.CLODINARY_CLOUD_NAME,
-  api_key: process.env.CLODINARY_API_KEY,
-  api_secret: process.env.CLODINARY_API_SECRET,
+  // Accept both spellings: the code previously used CLODINARY_* (typo),
+  // Vercel templates/docs use CLOUDINARY_*. Support both so a missing
+  // var never silently breaks uploads.
+  cloud_name:
+    process.env.CLOUDINARY_CLOUD_NAME || process.env.CLODINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY || process.env.CLODINARY_API_KEY,
+  api_secret:
+    process.env.CLOUDINARY_API_SECRET || process.env.CLODINARY_API_SECRET,
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
@@ -19,10 +24,20 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: "auto",
       quality_analysis: true,
     });
-    fs.unlinkSync(localFilePath);
+    try {
+      fs.unlinkSync(localFilePath);
+    } catch (_) {
+      // ignore cleanup errors on read-only serverless FS
+    }
     return response;
   } catch (error) {
-    fs.unlinkSync(localFilePath); //remove the locally saved file as the upload operation failed
+    try {
+      if (localFilePath && fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath); //remove the locally saved file as the upload operation failed
+      }
+    } catch (_) {
+      // ignore cleanup errors on read-only serverless FS
+    }
     return null;
   }
 };

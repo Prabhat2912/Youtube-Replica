@@ -1,99 +1,60 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { RiHome6Line } from "react-icons/ri";
-import { BiLike } from "react-icons/bi";
-import { FaHistory } from "react-icons/fa";
-import { FaFolder } from "react-icons/fa";
-import { TbUserCheck } from "react-icons/tb";
-import { FiVideo } from "react-icons/fi";
-import { IoIosHelpCircleOutline } from "react-icons/io";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { IoSettingsOutline } from "react-icons/io5";
-import { useState } from "react";
+import { MdOutlineExplore, MdOutlineSubscriptions } from "react-icons/md";
+import { FiClock, FiThumbsUp, FiFolder, FiSettings } from "react-icons/fi";
+import { BiHelpCircle } from "react-icons/bi";
 
-const Sidebar = () => {
-  const [btnClicked, setBtnClicked] = useState(false);
-  const handleBtnClick = () => {
-    setBtnClicked((prev) => !prev);
-  };
-  return (
-    <div
-      className={`bg-white ${
-        btnClicked ? "w-[70px]" : "w-1/5"
-      } min-h-[calc(100vh-72px)]  p-4 flex flex-col items-center justify-between border-r  transition-all duration-150 ease-in-out `}
-    >
-      <div className="w-[90%] flex flex-col gap-2 ">
-        <button
-          onClick={handleBtnClick}
-          className=" w-full  p-2 flex items-center gap-5 "
-        >
-          <GiHamburgerMenu /> {btnClicked ? "" : "PlayTube"}
-        </button>
-        {navLinks.map((navlink, i) => (
-          <Link
-            key={i}
-            to={navlink.to}
-            className=" flex  items-center p-2 gap-2 "
-          >
-            {navlink.icon}
-            {btnClicked ? "" : navlink.title}
-          </Link>
-        ))}
+const linkCls = ({ isActive }) =>
+  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+    isActive
+      ? "bg-orange-50 text-orange-700"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+  }`;
+
+const Sidebar = ({ collapsed }) => (
+  <aside
+    className={`${
+      collapsed ? "w-[76px]" : "w-60"
+    } hidden min-h-[calc(100vh-64px)] shrink-0 flex-col justify-between border-r border-slate-200 bg-white p-3 transition-all duration-200 sm:flex`}
+    aria-label="Primary"
+  >
+    <nav className="flex flex-col gap-1">
+      <NavLink to="/home" className={linkCls} end>
+        <RiHome6Line size={19} /> {!collapsed && "Home"}
+      </NavLink>
+      <NavLink to="/search" className={linkCls}>
+        <MdOutlineExplore size={19} /> {!collapsed && "Explore"}
+      </NavLink>
+      <NavLink to="/dashboard" className={linkCls}>
+        <MdOutlineSubscriptions size={19} /> {!collapsed && "Subscriptions"}
+      </NavLink>
+      <div className={`my-2 border-t border-slate-100 ${collapsed ? "mx-1" : "mx-2"}`} />
+      <NavLink to="/profile" className={linkCls}>
+        <FiClock size={18} /> {!collapsed && "History"}
+      </NavLink>
+      <NavLink to="/dashboard" className={linkCls}>
+        <FiThumbsUp size={18} /> {!collapsed && "Liked"}
+      </NavLink>
+      <NavLink to="/dashboard" className={linkCls}>
+        <FiFolder size={18} /> {!collapsed && "Library"}
+      </NavLink>
+    </nav>
+    {!collapsed && (
+      <div className="rounded-2xl bg-stone-100 p-4 text-[13px] leading-5 text-slate-600">
+        <p className="font-semibold text-slate-900">New to PlayTube?</p>
+        <p className="mt-1">Verify your email to upload, comment and save playlists.</p>
       </div>
-      <div className="w-[90%] flex flex-col gap-2 ">
-        {footerNav.map((navlink, i) => (
-          <Link key={i} to="/" className=" flex  items-center p-2 gap-2 ">
-            {navlink.icon}
-            {btnClicked ? "" : navlink.title}
-          </Link>
-        ))}
-      </div>
+    )}
+    <div className="flex flex-col gap-1">
+      <NavLink to="/profile" className={linkCls}>
+        <FiSettings size={18} /> {!collapsed && "Settings"}
+      </NavLink>
+      <NavLink to="/" className={linkCls}>
+        <BiHelpCircle size={18} /> {!collapsed && "Help"}
+      </NavLink>
     </div>
-  );
-};
+  </aside>
+);
 
 export default Sidebar;
-
-const navLinks = [
-  {
-    title: "Home",
-    icon: <RiHome6Line />,
-    to: "/",
-  },
-  {
-    title: "Liked Videos",
-    icon: <BiLike />,
-    to: "/dashboard",
-  },
-  {
-    title: "Watch History",
-    icon: <FaHistory />,
-    to: "/profile",
-  },
-  {
-    title: "My content",
-    icon: <FiVideo />,
-    to: "/search-view",
-  },
-  {
-    title: "Collection",
-    icon: <FaFolder />,
-    to: "/video",
-  },
-  {
-    title: "Subscribers",
-    icon: <TbUserCheck />,
-    to: "/",
-  },
-];
-
-const footerNav = [
-  {
-    title: "Support",
-    icon: <IoIosHelpCircleOutline />,
-  },
-  {
-    title: "Settings",
-    icon: <IoSettingsOutline />,
-  },
-];

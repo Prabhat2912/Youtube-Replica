@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import logo from "../../assets/images/logo.png";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   login,
   register,
@@ -11,6 +9,10 @@ import {
 import uploadOnCloudinary from "../../function/cloudinary";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
+import Logo from "../Brand/Logo";
+
+const field =
+  "h-12 w-full rounded-xl border border-slate-200 bg-stone-50 px-4 text-[15px] text-slate-900 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100";
 
 const SignUp = () => {
   const [data, setData] = useState({
@@ -21,158 +23,120 @@ const SignUp = () => {
     email: "",
     password: "",
   });
-
   const [images, setImages] = useState({ avatarFile: "", coverImageFile: "" });
+  const [preview, setPreview] = useState(null);
   const authState = useSelector(selectAuth);
   const dispatch = useDispatch();
-  const [preview, setPreview] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleImageChange = (event, imageType) => {
     const file = event.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
     reader.readAsDataURL(file);
-
-    reader.onload = () => {
-      setPreview({ ...preview, [imageType]: reader.result });
-    };
+    reader.onload = () => setPreview((p) => ({ ...p, [imageType]: reader.result }));
   };
 
-  const navigate = useNavigate();
   const handleSignUp = async (e) => {
     e.preventDefault();
-
-    const signUpPromise = () => {
-      return new Promise(async (resolve, reject) => {
+    const signUpPromise = () =>
+      new Promise(async (resolve, reject) => {
         try {
-          const [res1, res2] = await Promise.all([
-            uploadOnCloudinary(images.avatarFile),
-            uploadOnCloudinary(images.coverImageFile),
-          ]);
-
-          const registerResponse = await dispatch(
-            register({ ...data, avatar: res1.url, coverImage: res2.url })
+          const uploads = [];
+          if (images.avatarFile) uploads.push(uploadOnCloudinary(images.avatarFile));
+          if (images.coverImageFile) uploads.push(uploadOnCloudinary(images.coverImageFile));
+          const [avatarRes, coverRes] = await Promise.all(
+            uploads.length ? uploads : [Promise.resolve(null), Promise.resolve(null)]
           );
-          console.log(registerResponse);
-
+          const registerResponse = await dispatch(
+            register({
+              ...data,
+              avatar: avatarRes?.url || data.avatar,
+              coverImage: coverRes?.url || data.coverImage,
+            })
+          );
           if (registerResponse.payload) {
             const loginResponse = await dispatch(
               login({ username: data.username, password: data.password })
             );
-            console.log(loginResponse);
-
             if (loginResponse.payload) {
-              resolve("Registration and login successful!");
-              navigate("/");
+              resolve("ok");
+              // New accounts confirm email before full access
+              navigate("/verify-otp", { state: { email: data.email, next: "/home" } });
             } else {
-              reject(new Error("Login failed after registration."));
+              reject(new Error("Registered, but automatic login failed. Please log in."));
             }
           } else {
             reject(new Error("Registration failed."));
           }
-        } catch (error) {
+        } catch {
           reject(new Error("An error occurred during sign-up."));
         }
       });
-    };
     toast.promise(signUpPromise, {
-      loading: "Signing up...",
-      success: (message) => "User Registered successfully",
+      loading: "Creating your account…",
+      success: "Account created — check your inbox for the code",
       error: (error) => `Error: ${error.message}`,
     });
   };
 
   return (
-    <div className="w-full p-4 h-[full]  flex flex-col justify-center   items-center ">
-      <img src={logo} alt="" width={80} />
-      <form
-        className="flex flex-col  bg-gray-200 justify-center  rounded-md shadow-md p-8 w-[400px] transition-all duration-200 ease-in-out  gap-y-4 "
-        onSubmit={handleSignUp}
-      >
-        <h1 className="">Full Name</h1>
-        <input
-          type="text"
-          onChange={(e) => setData({ ...data, fullName: e.target.value })}
-          placeholder="Enter Full Name"
-          className="outline-none text-black px-4 py-2 rounded-md "
-        />
-        <h1 className="">Username</h1>
-        <input
-          type="text"
-          onChange={(e) => setData({ ...data, username: e.target.value })}
-          placeholder="Enter Username"
-          className="outline-none text-black px-4 py-2 rounded-md   "
-        />
-        <h1 className="">Email</h1>
-        <input
-          type="email"
-          placeholder="Enter Email"
-          className="px-4 py-2 text-black rounded-md outline-none "
-          onChange={(e) => setData({ ...data, email: e.target.value })}
-        />
-        <h1 className="">Password</h1>
-        <input
-          type="password"
-          placeholder="Enter Password"
-          className="px-4 py-2 text-black rounded-md outline-none "
-          onChange={(e) => setData({ ...data, password: e.target.value })}
-        />
-        <h1 className="">Avatar</h1>
-        <div className="border rounded-lg border-black">
-          {" "}
-          <input
-            type="file"
-            className="px-4 py-2 rounded-md border-b-2 w-full border-black outline-none  "
-            onChange={(e) => {
-              setImages({ ...images, avatarFile: e.target.files[0] });
-              handleImageChange(e, "avatar");
-            }}
-          />
-          {preview?.avatar && (
-            <div className="flex w-full h-[50px] justify-center ">
-              <img alt="avatar" src={preview.avatar} width={60} height={50} />
-            </div>
-          )}
-        </div>
+    <div className="flex min-h-screen w-full flex-col items-center bg-stone-50 px-4 py-10">
+      <Logo />
+      <form onSubmit={handleSignUp} className="mt-6 w-full max-w-md rounded-2xl bg-white p-8 shadow-pop">
+        <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
+        <p className="mt-1 text-sm text-slate-500">Free forever. Verify your email to start uploading.</p>
 
-        <h1 className="">Cover Image</h1>
-        <div className="border rounded-lg border-black">
-          <input
-            type="file"
-            className="px-4 py-2 rounded-md border-b-2 w-full border-black outline-none  "
-            onChange={(e) => {
-              setImages({ ...images, coverImageFile: e.target.files[0] });
-              handleImageChange(e, "coverImage");
-            }}
-          />
-          {preview?.coverImage && (
-            <div className="flex w-full h-[50px] justify-center ">
-              <img
-                alt="coverImage"
-                src={preview.coverImage}
-                width={60}
-                height={60}
-              />
-            </div>
-          )}{" "}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Full name</span>
+            <input type="text" required placeholder="Aarav Sharma" className={field}
+              onChange={(e) => setData({ ...data, fullName: e.target.value })} />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Username</span>
+            <input type="text" required placeholder="aarav" className={field}
+              onChange={(e) => setData({ ...data, username: e.target.value })} />
+          </label>
+        </div>
+        <label className="mt-4 block">
+          <span className="mb-1.5 block text-sm font-semibold text-slate-700">Email</span>
+          <input type="email" required placeholder="you@example.com" autoComplete="email" className={field}
+            onChange={(e) => setData({ ...data, email: e.target.value })} />
+        </label>
+        <label className="mt-4 block">
+          <span className="mb-1.5 block text-sm font-semibold text-slate-700">Password</span>
+          <input type="password" required placeholder="At least 8 characters" autoComplete="new-password" className={field}
+            onChange={(e) => setData({ ...data, password: e.target.value })} />
+        </label>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Avatar</span>
+            <input type="file" accept="image/*"
+              className="w-full rounded-xl border border-dashed border-slate-300 bg-stone-50 px-3 py-2.5 text-sm file:mr-2 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-white"
+              onChange={(e) => { setImages({ ...images, avatarFile: e.target.files[0] }); handleImageChange(e, "avatar"); }} />
+            {preview?.avatar && <img alt="Avatar preview" src={preview.avatar} className="mt-2 h-14 w-14 rounded-full object-cover" />}
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Cover image</span>
+            <input type="file" accept="image/*"
+              className="w-full rounded-xl border border-dashed border-slate-300 bg-stone-50 px-3 py-2.5 text-sm file:mr-2 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-white"
+              onChange={(e) => { setImages({ ...images, coverImageFile: e.target.files[0] }); handleImageChange(e, "coverImage"); }} />
+            {preview?.coverImage && <img alt="Cover preview" src={preview.coverImage} className="mt-2 h-14 w-full rounded-lg object-cover" />}
+          </label>
         </div>
 
         <button
           type="submit"
-          className={`px-4 py-2 rounded-md bg-gray-900 h-10 ${
-            authState.isLoading ? "" : "hover:bg-gray-500 hover:text-black"
-          }  text-white transition-all duration-150 ease-in hover:text-black`}
+          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-orange-600 text-[15px] font-semibold text-white transition hover:bg-orange-500 disabled:opacity-60"
           disabled={authState.isLoading}
         >
-          {authState.isLoading ? (
-            <ScaleLoader
-              loading={authState.isLoading}
-              color="white"
-              height={20}
-            />
-          ) : (
-            "Sign Up"
-          )}
+          {authState.isLoading ? <ScaleLoader loading color="white" height={20} /> : "Sign up"}
         </button>
+        <p className="mt-4 text-center text-sm text-slate-500">
+          Have an account? <Link to="/login" className="font-semibold text-orange-600 hover:text-orange-500">Log in</Link>
+        </p>
       </form>
     </div>
   );

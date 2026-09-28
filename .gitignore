@@ -1,2 +1,9 @@
 # Ignore project.txt file
 project.txt
+
+# AI harness / design-skill directories (local only, regenerated via npx)
+.opencode/
+.agent/
+.cursor/
+.gemini/
+.impeccable/

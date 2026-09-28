@@ -7,11 +7,13 @@ import {
   Navigate,
 } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
+import Landing from "./pages/Landing/Landing";
 import Home from "./pages/Home/home";
 import Dashboard from "./pages/Dashboard/dashboard";
 import Profile from "./pages/Profile/profile";
 import SearchView from "./pages/SearchView/searchView";
 import VideoPlayer from "./pages/Video-Player/videoPlayer";
+import VerifyOtp from "./pages/VerifyOtp/VerifyOtp";
 import Login from "./components/Login/Login";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -23,21 +25,20 @@ import { Toaster } from "sonner";
 
 const ProtectedRoute = ({ element }) => {
   const { isLogin } = useSelector(selectAuth);
-
   if (!isLogin) {
     return <Navigate to="/login" replace />;
-    authenticated;
   }
-
   return element;
 };
 
 const routes = (
   <Route>
+    <Route path="/" element={<Landing />} />
     <Route path="signup" element={<SignUp />} />
     <Route path="login" element={<Login />} />
-    <Route path="/" element={<Layout />}>
-      <Route path="/" element={<Home />} />
+    <Route path="verify-otp" element={<VerifyOtp />} />
+    <Route element={<Layout />}>
+      <Route path="home" element={<Home />} />
       <Route
         path="dashboard"
         element={<ProtectedRoute element={<Dashboard />} />}
@@ -46,12 +47,13 @@ const routes = (
         path="profile"
         element={<ProtectedRoute element={<Profile />} />}
       />
-      <Route
-        path="search-view"
-        element={<ProtectedRoute element={<SearchView />} />}
-      />
+      <Route path="search" element={<SearchView />} />
+      {/* legacy alias */}
+      <Route path="search-view" element={<SearchView />} />
+      <Route path="video/:id" element={<VideoPlayer />} />
+      {/* legacy alias */}
       <Route path="video" element={<VideoPlayer />} />
-      <Route path="*" element={<div>Not Found</div>} />
+      <Route path="*" element={<div className="p-10 text-center text-slate-500">Nothing here yet — <a className="font-semibold text-orange-600" href="/home">back to feed</a></div>} />
     </Route>
   </Route>
 );
@@ -72,7 +74,8 @@ function App() {
 
   return (
     <>
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
+      <Toaster position="bottom-right" />
     </>
   );
 }

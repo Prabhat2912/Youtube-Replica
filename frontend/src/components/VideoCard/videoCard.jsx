@@ -1,53 +1,46 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const VideoCard = ({ data }) => {
-  const formatViews = (views) => {
-    if (views >= 1000000) {
-      return `${views / 1000000}M Views`;
-    } else if (views >= 1000) {
-      return `${views / 1000}K Views`;
-    } else {
-      return `${views} Views`;
-    }
-  };
+export function formatViews(views) {
+  if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M views`;
+  if (views >= 1000) return `${(views / 1000).toFixed(1)}K views`;
+  return `${views} views`;
+}
 
-  const handleChannelClick = () => {
-    history.push(data.channelLink);
-  };
-  return (
-    <Link
-      to={data.videoLink}
-      className="w-[24%] bg-white/80 h-[35%] text-black flex flex-col rounded-lg mt-1 hover:border  p-2 transition-all duration-150 ease-in-out "
-    >
-      <div className="mb-5">
-        <img src={data.thumbnail} alt="thumbnail" className="w-full h-[30%] " />
-      </div>
-      <div className=" w-full items-center justify-center flex mb-2 gap-1  ">
-        <img
-          src={data.profilePic}
-          alt="DP"
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
-        <h1 className=" w-[90%]  font-medium text-[16px] leading-6 ">
+const VideoCard = ({ data }) => (
+  <Link
+    to={data.videoLink}
+    className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-pop"
+  >
+    <div className="relative aspect-video overflow-hidden bg-slate-100">
+      <img
+        src={data.thumbnail}
+        alt={data.title}
+        loading="lazy"
+        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+      />
+      <span className="absolute bottom-2 right-2 rounded-md bg-slate-950/85 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-white">
+        {data.duration}
+      </span>
+    </div>
+    <div className="flex gap-3 p-3.5">
+      <img
+        src={data.avatar}
+        alt={data.channel}
+        loading="lazy"
+        className="h-9 w-9 shrink-0 rounded-full bg-slate-100 object-cover"
+      />
+      <div className="min-w-0">
+        <h3 className="clamp-2 text-[14.5px] font-semibold leading-5 text-slate-900">
           {data.title}
-        </h1>
+        </h3>
+        <p className="mt-1.5 truncate text-[13px] text-slate-500">{data.channel}</p>
+        <p className="text-[12.5px] tabular-nums text-slate-500">
+          {formatViews(data.views)} · {data.age}
+        </p>
       </div>
-
-      <div className="w-full flex flex-col ml-14   font-normal text-[12px] leading-5 ">
-        <div className="flex gap-2 ">
-          <p>{formatViews(data.views)} </p>
-          <p>•</p>
-          <p>{data.uploadTime}</p>
-        </div>
-        <div>
-          <Link to={data.channelLink}>{data.channel}</Link>
-        </div>
-      </div>
-    </Link>
-  );
-};
+    </div>
+  </Link>
+);
 
 export default VideoCard;
