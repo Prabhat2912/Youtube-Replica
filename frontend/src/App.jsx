@@ -31,6 +31,7 @@ import {
   checkAuthOnRefresh,
 } from "./Redux/Features/Auth/AuthSlice";
 import SignUp from "./components/Signup/signUp";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Toaster } from "sonner";
 
 const ProtectedRoute = ({ element }) => {
@@ -100,10 +101,10 @@ function App() {
   }, [dispatch, isLogin]);
 
   return (
-    <>
+    <ErrorBoundary>
       <RouterProvider router={router} />
       <Toaster position="bottom-right" />
-    </>
+    </ErrorBoundary>
   );
 }
 
