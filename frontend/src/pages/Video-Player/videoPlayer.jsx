@@ -66,7 +66,7 @@ const VideoPlayer = () => {
                 <p className="text-sm font-bold text-zinc-100">{current.channel}</p>
                 <p className="text-[12.5px] text-zinc-500">{formatViews(842000)} in the room</p>
               </div>
-              <button className="ml-2 h-9 rounded-full bg-lime px-5 text-sm font-bold text-void hover:bg-lime-bright">
+              <button className="ml-2 h-9 rounded-full bg-volt px-5 text-sm font-bold text-void hover:bg-volt-bright">
                 Follow
               </button>
             </div>
@@ -75,7 +75,7 @@ const VideoPlayer = () => {
                 <button
                   onClick={() => setLiked(liked === "up" ? null : "up")}
                   aria-pressed={liked === "up"}
-                  className={`flex h-full items-center gap-1.5 px-4 text-sm font-bold ${liked === "up" ? "text-lime" : "text-zinc-400 hover:text-zinc-100"}`}
+                  className={`flex h-full items-center gap-1.5 px-4 text-sm font-bold ${liked === "up" ? "text-volt" : "text-zinc-400 hover:text-zinc-100"}`}
                 >
                   <FiThumbsUp /> 12K
                 </button>
@@ -84,18 +84,18 @@ const VideoPlayer = () => {
                   onClick={() => setLiked(liked === "down" ? null : "down")}
                   aria-pressed={liked === "down"}
                   aria-label="Dislike"
-                  className={`flex h-full items-center px-3.5 ${liked === "down" ? "text-lime" : "text-zinc-400 hover:text-zinc-100"}`}
+                  className={`flex h-full items-center px-3.5 ${liked === "down" ? "text-volt" : "text-zinc-400 hover:text-zinc-100"}`}
                 >
                   <FiThumbsDown />
                 </button>
               </div>
               <button onClick={share} className="flex h-10 items-center gap-1.5 rounded-full border border-line bg-panel px-4 text-sm font-bold text-zinc-300 hover:text-zinc-100">
-                {shared ? <FiCheck className="text-lime" /> : <FiShare2 />} {shared ? "Copied" : "Share"}
+                {shared ? <FiCheck className="text-volt" /> : <FiShare2 />} {shared ? "Copied" : "Share"}
               </button>
               <button
                 onClick={() => setSaved((v) => !v)}
                 aria-pressed={saved}
-                className={`flex h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-bold ${saved ? "border-lime/50 bg-lime/10 text-lime" : "border-line bg-panel text-zinc-300 hover:text-zinc-100"}`}
+                className={`flex h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-bold ${saved ? "border-volt/50 bg-volt/10 text-volt" : "border-line bg-panel text-zinc-300 hover:text-zinc-100"}`}
               >
                 <FiBookmark /> {saved ? "Kept" : "Keep"}
               </button>
@@ -110,19 +110,19 @@ const VideoPlayer = () => {
           <section className="mt-6" aria-label="Comments">
             <h2 className="text-base font-bold text-zinc-100">{list.length} reactions</h2>
             <form onSubmit={post} className="mt-3 flex gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-lime text-sm font-black text-void">Y</span>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-volt text-sm font-black text-void">Y</span>
               <div className="flex-1">
                 <input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder="Shout something nice…"
                   aria-label="Add a comment"
-                  className="h-11 w-full rounded-xl border border-line bg-panel px-4 text-sm text-zinc-100 outline-none transition focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
+                  className="h-11 w-full rounded-xl border border-line bg-panel px-4 text-sm text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
                 />
                 {draft && (
                   <div className="mt-2 flex justify-end gap-2">
                     <button type="button" onClick={() => setDraft("")} className="h-9 rounded-full px-4 text-sm font-bold text-zinc-500 hover:bg-panel">Cancel</button>
-                    <button type="submit" className="h-9 rounded-full bg-lime px-5 text-sm font-bold text-void hover:bg-lime-bright">React</button>
+                    <button type="submit" className="h-9 rounded-full bg-volt px-5 text-sm font-bold text-void hover:bg-volt-bright">React</button>
                   </div>
                 )}
               </div>
@@ -146,7 +146,7 @@ const VideoPlayer = () => {
           {videos.filter((v) => v.id !== current.id).slice(0, 6).map((v) => (
             <VideoCard key={v.id} data={v} />
           ))}
-          <Link to="/home" className="block rounded-2xl border border-line bg-panel p-4 text-center text-sm font-bold text-lime hover:border-lime/50">
+          <Link to="/home" className="block rounded-2xl border border-line bg-panel p-4 text-center text-sm font-bold text-volt hover:border-volt/50">
             Back to the program
           </Link>
         </aside>

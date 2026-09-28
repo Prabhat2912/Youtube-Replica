@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --lime: #c8ff2e;
+  --volt: #00e5ff;
   --blaze: #ff5a1f;
   --void: #0a0a0f;
 }
@@ -20,19 +20,19 @@ body {
 }
 
 ::selection {
-  background: #c8ff2e;
+  background: #00e5ff;
   color: #0a0a0f;
 }
 
 :focus-visible {
-  outline: 2px solid #c8ff2e;
+  outline: 2px solid #00e5ff;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
 input,
 textarea {
-  caret-color: #c8ff2e;
+  caret-color: #00e5ff;
 }
 
 input::placeholder {
@@ -72,11 +72,20 @@ input::placeholder {
 }
 
 .otp-box {
-  caret-color: #c8ff2e;
+  caret-color: #00e5ff;
   font-variant-numeric: tabular-nums;
 }
 .otp-box:disabled {
   opacity: 0.6;
+}
+
+.cursor-glow {
+  transition: scale 0.35s ease, opacity 0.35s ease;
+  scale: 1;
+}
+
+.cursor-glow.cursor-big {
+  scale: 2.4;
 }
 
 /* The one authored motion: the marquee tape. Everything else stays still. */
@@ -112,7 +121,7 @@ input::placeholder {
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 8px 1px rgb(200 255 46 / 0.7);
+    box-shadow: 0 0 8px 1px rgb(0 229 255 / 0.7);
   }
   50% {
     opacity: 0.25;

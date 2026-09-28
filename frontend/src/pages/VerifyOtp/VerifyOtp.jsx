@@ -86,7 +86,7 @@ const VerifyOtp = () => {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="you@example.com"
-                  className="h-12 w-full rounded-xl border border-line bg-void pl-10 pr-4 text-[15px] text-zinc-100 outline-none transition focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
+                  className="h-12 w-full rounded-xl border border-line bg-void pl-10 pr-4 text-[15px] text-zinc-100 outline-none transition focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
                 />
               </span>
             </label>
@@ -94,7 +94,7 @@ const VerifyOtp = () => {
             <button
               type="submit"
               disabled={sending || !address}
-              className="h-12 w-full rounded-xl bg-lime text-[15px] font-bold text-void transition hover:bg-lime-bright disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-12 w-full rounded-xl bg-volt text-[15px] font-bold text-void transition hover:bg-volt-bright disabled:cursor-not-allowed disabled:opacity-60"
             >
               {sending ? "Sending…" : "Send my ticket"}
             </button>
@@ -106,7 +106,7 @@ const VerifyOtp = () => {
             <button
               type="submit"
               disabled={verifying || code.replace(/\D/g, "").length !== 6}
-              className="h-12 w-full rounded-xl bg-lime text-[15px] font-bold text-void transition hover:bg-lime-bright disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-12 w-full rounded-xl bg-volt text-[15px] font-bold text-void transition hover:bg-volt-bright disabled:cursor-not-allowed disabled:opacity-60"
             >
               {verifying ? "Checking…" : "Let me in"}
             </button>
@@ -118,7 +118,7 @@ const VerifyOtp = () => {
                 type="button"
                 onClick={send}
                 disabled={left > 0 || sending}
-                className="inline-flex items-center gap-1.5 font-bold text-lime hover:text-lime-bright disabled:cursor-not-allowed disabled:text-zinc-600"
+                className="inline-flex items-center gap-1.5 font-bold text-volt hover:text-volt-bright disabled:cursor-not-allowed disabled:text-zinc-600"
               >
                 <FiRefreshCw size={14} /> {left > 0 ? `Resend in ${left}s` : "Resend ticket"}
               </button>
@@ -127,7 +127,7 @@ const VerifyOtp = () => {
         )}
 
         <p className="mt-6 text-center text-[13px] text-zinc-500">
-          Already inside? <Link to="/login" className="font-bold text-lime hover:text-lime-bright">Log in</Link>
+          Already inside? <Link to="/login" className="font-bold text-volt hover:text-volt-bright">Log in</Link>
         </p>
       </div>
     </div>

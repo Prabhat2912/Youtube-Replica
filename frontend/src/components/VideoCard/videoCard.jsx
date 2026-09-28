@@ -10,7 +10,7 @@ export function formatViews(views) {
 const VideoCard = ({ data }) => (
   <Link
     to={data.videoLink}
-    className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition duration-200 hover:-translate-y-1 hover:border-lime/50 hover:shadow-glow"
+    className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition duration-200 hover:-translate-y-1 hover:border-volt/50 hover:shadow-glow"
   >
     <div className="relative aspect-video overflow-hidden bg-black">
       <img
@@ -23,7 +23,7 @@ const VideoCard = ({ data }) => (
         {data.duration}
       </span>
       <span className="absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100">
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-lime text-void">
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-volt text-void">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M8 5.5v13l11-6.5-11-6.5Z" />
           </svg>

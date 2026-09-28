@@ -52,10 +52,10 @@ const OtpInput = ({ value, onChange, disabled, error }) => {
           <input
             key={i}
             ref={(el) => (refs.current[i] = el)}
-            className={`otp-box h-12 w-11 rounded-xl border bg-void text-center text-lg font-black text-lime outline-none transition sm:h-[52px] sm:w-12 ${
+            className={`otp-box h-12 w-11 rounded-xl border bg-void text-center text-lg font-black text-volt outline-none transition sm:h-[52px] sm:w-12 ${
               error
                 ? "border-blaze focus:border-blaze-hot focus:ring-2 focus:ring-blaze/20"
-                : "border-line focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
+                : "border-line focus:border-volt/60 focus:ring-2 focus:ring-volt/15"
             }`}
             inputMode="numeric"
             autoComplete={i === 0 ? "one-time-code" : "off"}

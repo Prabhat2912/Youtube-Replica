@@ -22,7 +22,7 @@ const Home = () => {
             aria-pressed={active === c}
             className={`h-9 shrink-0 rounded-full px-4 text-sm font-bold transition ${
               active === c
-                ? "bg-lime text-void"
+                ? "bg-volt text-void"
                 : "border border-line bg-panel text-zinc-400 hover:border-zinc-600 hover:text-zinc-100"
             }`}
           >

@@ -14,6 +14,8 @@ import Profile from "./pages/Profile/profile";
 import SearchView from "./pages/SearchView/searchView";
 import VideoPlayer from "./pages/Video-Player/videoPlayer";
 import VerifyOtp from "./pages/VerifyOtp/VerifyOtp";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import Login from "./components/Login/Login";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -37,6 +39,8 @@ const routes = (
     <Route path="signup" element={<SignUp />} />
     <Route path="login" element={<Login />} />
     <Route path="verify-otp" element={<VerifyOtp />} />
+    <Route path="forgot-password" element={<ForgotPassword />} />
+    <Route path="reset-password" element={<ResetPassword />} />
     <Route element={<Layout />}>
       <Route path="home" element={<Home />} />
       <Route
@@ -53,7 +57,7 @@ const routes = (
       <Route path="video/:id" element={<VideoPlayer />} />
       {/* legacy alias */}
       <Route path="video" element={<VideoPlayer />} />
-      <Route path="*" element={<div className="p-10 text-center text-zinc-500">This reel is blank — <a className="font-bold text-lime" href="/home">back to the program</a></div>} />
+      <Route path="*" element={<div className="p-10 text-center text-zinc-500">This reel is blank — <a className="font-bold text-volt" href="/home">back to the program</a></div>} />
     </Route>
   </Route>
 );

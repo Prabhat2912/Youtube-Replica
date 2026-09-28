@@ -9,16 +9,19 @@ export const PlayMark = ({ size = 36 }) => (
     fill="none"
     aria-hidden="true"
   >
-    <rect width="48" height="48" rx="14" fill="#C8FF2E" />
-    <path d="M19 15.5v17l14.5-8.5L19 15.5Z" fill="#0A0A0F" />
-    <ellipse
-      cx="24"
-      cy="24"
-      rx="20"
-      ry="9"
-      transform="rotate(-18 24 24)"
+    <rect width="48" height="48" rx="14" fill="#00E5FF" />
+    <path d="M15 17v14l12-7-12-7Z" fill="#0A0A0F" />
+    <path
+      d="M29 14.5a14 14 0 0 1 0 19"
+      stroke="#0A0A0F"
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+    <path
+      d="M34 10.5a20 20 0 0 1 0 27"
       stroke="#FF5A1F"
       strokeWidth="3"
+      strokeLinecap="round"
     />
   </svg>
 );
@@ -33,7 +36,7 @@ const Logo = ({ compact = false }) => (
     {!compact && (
       <span className="text-[20px] font-extrabold lowercase leading-none tracking-tight">
         <span className="text-zinc-100">play</span>
-        <span className="text-lime">tube</span>
+        <span className="text-volt">tube</span>
       </span>
     )}
   </Link>

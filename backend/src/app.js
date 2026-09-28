@@ -33,6 +33,7 @@ app.get("/", (req, res) => {
 //routes import
 import userRouter from "./routes/user.routes.js";
 import otpRouter from "./routes/otp.routes.js";
+import passwordRouter from "./routes/password.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import videoRouter from "./routes/video.routes.js";
 import tweetRouter from "./routes/tweet.routes.js";
@@ -45,6 +46,7 @@ import healthcheckRouter from "./routes/healthcheck.routes.js";
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/users", otpRouter); // POST /send-otp, POST /verify-otp
+app.use("/api/v1/users", passwordRouter); // POST /forgot-password, POST /reset-password
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/videos", videoRouter);
 app.use("/api/v1/tweets", tweetRouter);

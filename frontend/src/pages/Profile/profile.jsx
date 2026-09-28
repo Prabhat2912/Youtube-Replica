@@ -25,7 +25,7 @@ const Profile = () => {
           {user.avatar ? (
             <img src={user.avatar} alt={name} className="h-20 w-20 rounded-full border-4 border-void object-cover" />
           ) : (
-            <span className="grid h-20 w-20 place-items-center rounded-full border-4 border-void bg-lime text-3xl font-black text-void">
+            <span className="grid h-20 w-20 place-items-center rounded-full border-4 border-void bg-volt text-3xl font-black text-void">
               {initial}
             </span>
           )}
@@ -33,7 +33,7 @@ const Profile = () => {
             <h1 className="text-2xl font-black tracking-tight text-zinc-100">{name}</h1>
             <p className="text-sm text-zinc-500">{user.email || "Sign in to sync your library"}</p>
           </div>
-          <Link to="/verify-otp" className="mb-1 ml-auto inline-flex h-10 items-center rounded-full border border-line bg-panel px-5 text-sm font-bold text-zinc-200 hover:border-lime/50 hover:text-lime">
+          <Link to="/verify-otp" className="mb-1 ml-auto inline-flex h-10 items-center rounded-full border border-line bg-panel px-5 text-sm font-bold text-zinc-200 hover:border-volt/50 hover:text-volt">
             Verify email
           </Link>
         </div>
