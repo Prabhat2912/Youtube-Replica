@@ -62,7 +62,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
   const subscribedTo = await Subscription.find({
     subscriber: channelId,
-  });
+  }).populate("channel", "fullName username avatar");
 
   const totalSubto = await Subscription.countDocuments({
     subscriber: channelId,

@@ -34,6 +34,7 @@ const Header = ({ onMenuClick }) => {
   };
 
   return (
+    <>
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-void/90 px-3 backdrop-blur sm:px-5">
       <button
         onClick={onMenuClick}
@@ -102,6 +103,26 @@ const Header = ({ onMenuClick }) => {
         )}
       </div>
     </header>
+    <div className="border-b border-line bg-void px-3 py-2 md:hidden">
+      <form onSubmit={submitSearch} className="relative" role="search">
+        <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          type="search"
+          placeholder="Search films, channels, moods"
+          aria-label="Search videos"
+          className="h-11 w-full rounded-full border border-line bg-panel pl-11 pr-20 text-sm text-zinc-100 outline-none transition focus:border-ember/60"
+        />
+        <button
+          type="submit"
+          className="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-ember px-3.5 text-sm font-bold text-white"
+        >
+          Go
+        </button>
+      </form>
+    </div>
+    </>
   );
 };
 

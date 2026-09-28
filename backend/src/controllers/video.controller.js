@@ -34,7 +34,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
   const videos = await Video.find(queryOptions)
     .sort(sortOptions)
     .skip(skip)
-    .limit(parseInt(limit));
+    .limit(parseInt(limit))
+    .populate("owner", "fullName username avatar");
 
   return res
     .status(200)
@@ -96,7 +97,10 @@ const publishAVideo = asyncHandler(async (req, res) => {
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   //TODO: get video by id|
-  const existedVideo = await Video.findById(videoId);
+  const existedVideo = await Video.findById(videoId).populate(
+    "owner",
+    "fullName username avatar"
+  );
 
   if (!existedVideo) {
     throw new ApiError(400, "Video not found");

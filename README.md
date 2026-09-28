@@ -1,288 +1,206 @@
-# YouTube Replica - Backend Learning Project
+# PlayTube — the after-dark screening room for video
 
-A YouTube clone backend API built while learning backend development from **[Hitesh Choudhary Sir](https://github.com/hiteshchoudhary)** - a fabulous teacher and mentor in web development. This project demonstrates a production-ready backend with comprehensive features, while the frontend development is currently in progress.
+A full-stack video-sharing app (a YouTube-style replica with its own identity):
+an Express + MongoDB API and a React frontend with a public landing page,
+email-code verification, password reset, live feeds and creator tools —
+wrapped in the **Afterglow** design world (warm black, sunset ember + gold,
+Unbounded display type, film grain, GSAP motion).
 
-## 🎥 Demo
+Built by **Prabhat Kumar** while learning backend development from
+**[Hitesh Choudhary](https://github.com/hiteshchoudhary)**.
 
-> **Project Status**: The backend API is fully completed and functional (except livestreaming feature). The frontend is currently in early development phase and will be completed soon. Demo link will be added once the frontend is ready for deployment.
+## Live
 
-## ✨ Features
+- Frontend: `https://youtube-replica-frontend.vercel.app`
+  (`/` landing, `/home` feed, `/video/:id`, `/search`, auth + library pages)
+- Backend API: `https://youtube-clone-mu-seven.vercel.app`
+  (probe: `GET /` and `GET /api/v1/healthcheck`)
 
-### Backend API (✅ Completed)
+## Features
 
-- **User Authentication** - Register, login, logout with JWT
-- **Video Management** - Upload, watch, delete videos
-- **User Profiles** - View and edit user profiles
-- **Search Functionality** - Search for videos and users
-- **Dashboard** - Personal dashboard for content creators
-- **Subscriptions** - Subscribe/unsubscribe to channels
-- **Likes & Dislikes** - Like and dislike videos
-- **Comments** - Add, view, and manage comments
-- **Playlists** - Create and manage video playlists
-- **Tweets** - Share thoughts and updates
-- **File Upload** - Cloudinary integration for media storage
-- **RESTful API** - Complete backend API with all endpoints
+### Landing + growth (`/`)
 
-### Frontend (🚧 In Progress)
+- Premiere hero with lit-marquee cinema screen, twinkling bulbs and parallax
+- Scrolling marquee tape, glass bento grid, gold close band
+- GSAP throughout: cursor glow, magnetic CTAs, scroll reveals, scroll progress
+- SEO + AI-ready: meta/OG/Twitter cards, `WebSite` + per-video `VideoObject`
+  JSON-LD, per-route titles, `robots.txt`, `sitemap.xml`, `llms.txt`
 
-- **React Application** - Basic structure implemented
-- **Redux State Management** - Store configuration ready
-- **Component Architecture** - Core components being developed
-- **Responsive Design** - Tailwind CSS setup complete
-- **API Integration** - Axios configuration ready
+### Accounts
 
-### Pending Features
+- Register / login / logout with JWT (access cookie + refresh token)
+- **Email OTP verification** (`/verify-otp`) — 6-box input, paste support,
+  30s resend cooldown, 10-minute codes, 5-attempt lockout
+  - Real delivery via Gmail + nodemailer; local mock fallback when the API
+    is unreachable (dev only, `000000` passes in mock mode)
+- **Forgot / reset password** (`/forgot-password`, `/reset-password?token=`)
+  — single-use sha256-hashed tokens, 15-minute expiry, generic replies so
+  emails can't be probed
+- Profile with cover/avatar, Settings (account, password, session), Help desk
 
-- **Live Streaming** - Backend implementation pending
-- **Frontend UI/UX** - Complete user interface development
+### Watching (real data after login)
 
-## 🛠️ Tech Stack
+- `/home` — logged-in members get the **live network feed**
+  (`GET /videos`, owners populated); guests get a preview catalog
+- `/video/:id` — real Cloudinary playback for network premieres
+  (ObjectId route), preview cards otherwise; like, share-copy, keep,
+  live comments
+- `/search?q=` — results across titles, channels, categories
+- `/subscriptions` — followed channels with working unfollow
+- `/liked` (Applauded), `/library` (Collections/playlists)
+- `/profile` — real watch history (`GET /users/history`)
+- `/dashboard` — uploads + **live-counted stats** (views, applause,
+  collections, premieres)
 
-### Frontend
+### Backend API
 
-- **React 18** - UI library
-- **Vite** - Build tool and development server
-- **Redux Toolkit** - State management
-- **React Router Dom** - Client-side routing
-- **Tailwind CSS** - Utility-first CSS framework
-- **Axios** - HTTP client for API requests
-- **React Icons** - Icon library
-- **Cloudinary React** - Image and video optimization
+- Users, JWT auth + refresh, OTP, password reset, videos (CRUD, publish
+  toggle), likes, comments, subscriptions, playlists, tweets, dashboard,
+  healthcheck
+- Serverless-safe: `api/index.js` entry, cached Mongo connection, `/tmp`
+  uploads, JSON 404s + central error handler, bulletproof CORS (origin echo,
+  preflight short-circuit, headers on every response incl. errors)
 
-### Backend
+## Tech stack
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web application framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
-- **JWT** - Authentication tokens
-- **Bcrypt** - Password hashing
-- **Multer** - File upload middleware
-- **Cloudinary** - Cloud storage for media files
-- **CORS** - Cross-origin resource sharing
+| Layer    | Tech                                                              |
+| -------- | ----------------------------------------------------------------- |
+| Frontend | React 18, Vite 8, Tailwind CSS, Redux Toolkit, React Router, GSAP |
+| Backend  | Node.js, Express 4, MongoDB + Mongoose, JWT, bcryptjs, nodemailer |
+| Media    | Cloudinary (uploads, thumbnails, playback)                        |
+| Deploy   | Vercel (frontend static + backend serverless function)            |
 
-## 📁 Project Structure
+## Project structure
 
 ```
 Youtube-Replica/
-├── backend/                 # ✅ Backend API server (Completed)
+├── frontend/
 │   ├── src/
-│   │   ├── controllers/     # All route handlers implemented
-│   │   ├── models/         # Database schemas complete
-│   │   ├── routes/         # Full API routes setup
-│   │   ├── middlewares/    # Authentication & file upload middleware
-│   │   ├── utils/          # Utility functions and error handling
-│   │   └── db/             # Database connection configured
-│   ├── public/             # Static file serving
-│   └── package.json
-└── frontend/               # 🚧 React frontend (Early Development)
-    ├── src/
-    │   ├── components/     # Basic components structure
-    │   ├── pages/          # Page components in progress
-    │   ├── Redux/          # State management setup
-    │   ├── function/       # Utility functions
-    │   └── assets/         # Static assets
-    └── package.json
+│   │   ├── components/  # Brand, Header, SideBar, VideoCard, Otp, FeedStates…
+│   │   ├── pages/       # Landing, Home, Video-Player, SearchView,
+│   │   │                # VerifyOtp, ForgotPassword, ResetPassword,
+│   │   │                # Subscriptions, Library, Settings, Help,
+│   │   │                # Dashboard, Profile
+│   │   ├── function/    # libraryApi (authed client), otpApi, format, pageMeta
+│   │   ├── Redux/       # auth, profile, otp slices
+│   │   └── data/        # guest preview catalog (logged-out only)
+│   └── public/          # robots.txt, sitemap.xml, llms.txt
+└── backend/
+    ├── api/index.js     # Vercel serverless entry (no app.listen here)
+    ├── index.js         # local dev entry (npm run dev)
+    └── src/
+        ├── controllers/ # user, video, otp, password, like, comment…
+        ├── models/      # user, video, otp (TTL), resetToken (TTL)…
+        ├── routes/      # users, videos, likes, subscriptions, playlist…
+        ├── middlewares/ # JWT auth, multer (/tmp on Vercel)
+        └── utils/       # cors, mailer, cloudinary, ApiError/ApiResponse
 ```
 
-## 🚀 Getting Started
+## Getting started
 
-### Prerequisites
+Prerequisites: Node.js 20+, MongoDB, Cloudinary account, Gmail app password.
 
-- Node.js (v16 or higher)
-- MongoDB (local or cloud instance)
-- Cloudinary account for media storage
+```bash
+# backend
+cd backend
+npm install
+cp .env.sample .env   # then fill it in
+npm run dev            # http://localhost:8000
 
-### Installation
+# frontend
+cd frontend
+npm install
+cp .env.sample .env   # then fill it in
+npm run dev            # http://localhost:5173
+```
 
-1. **Clone the repository**
+### Backend `.env`
 
-   ```bash
-   git clone https://github.com/Prabhat2912/Youtube-Replica.git
-   cd Youtube-Replica
-   ```
+```env
+PORT=8000
+MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net
+CORS_ORIGIN=http://localhost:5173
+ACCESS_TOKEN_SECRET=<long random string>
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_SECRET=<long random string>
+REFRESH_TOKEN_EXPIRY=10d
+CLOUDINARY_CLOUD_NAME=<name>
+CLOUDINARY_API_KEY=<key>
+CLOUDINARY_API_SECRET=<secret>
+EMAIL_USER=<gmail address>
+EMAIL_PASS=<gmail app password — never commit>
+FRONTEND_URL=http://localhost:5173
+```
 
-2. **Install Backend Dependencies**
+### Frontend `.env`
 
-   ```bash
-   cd backend
-   npm install
-   ```
+```env
+VITE_BASE_URL=http://localhost:8000/api/v1
+VITE_CLOUDINARY_CLOUD_NAME=<name>
+VITE_UPLOAD_PRESET=<preset>
+```
 
-3. **Install Frontend Dependencies**
+## API endpoints
 
-   ```bash
-   cd ../frontend
-   npm install
-   # or if you prefer pnpm
-   pnpm install
-   ```
+| Method | Endpoint                              | Auth | Purpose              |
+| ------ | ------------------------------------- | ---- | -------------------- |
+| POST   | `/api/v1/users/register`              | –    | Register             |
+| POST   | `/api/v1/users/login`                 | –    | Login                |
+| POST   | `/api/v1/users/logout`                | ✅   | Logout               |
+| POST   | `/api/v1/users/refresh-token`         | –    | Refresh tokens       |
+| POST   | `/api/v1/users/send-otp`              | –    | Send email code      |
+| POST   | `/api/v1/users/verify-otp`            | –    | Verify email code    |
+| POST   | `/api/v1/users/forgot-password`       | –    | Send reset link      |
+| POST   | `/api/v1/users/reset-password`        | –    | Set new password     |
+| GET    | `/api/v1/users/current-user`          | ✅   | Current user         |
+| GET    | `/api/v1/users/history`               | ✅   | Watch history        |
+| GET    | `/api/v1/videos?userId=&limit=`       | ✅   | Feed / channel videos|
+| GET    | `/api/v1/videos/:videoId`             | ✅   | Single video         |
+| POST   | `/api/v1/videos`                      | ✅   | Publish video        |
+| GET    | `/api/v1/likes/videos`                | ✅   | Liked videos         |
+| POST   | `/api/v1/likes/toggle/v/:videoId`     | ✅   | Like/unlike          |
+| GET    | `/api/v1/subscriptions/c/:channelId`  | ✅   | Followed channels    |
+| POST   | `/api/v1/subscriptions/c/:channelId`  | ✅   | Follow/unfollow      |
+| GET    | `/api/v1/playlist/user/:userId`       | ✅   | Collections          |
+| GET    | `/api/v1/healthcheck`                 | –    | Health probe         |
 
-4. **Environment Setup**
+List endpoints populate owners/channels (`fullName username avatar`).
 
-   Create a `.env` file in the backend directory:
+## Deploying the backend (Vercel)
 
-   ```env
-   PORT=8000
-   MONGODB_URI=your_mongodb_connection_string
-   CORS_ORIGIN=http://localhost:5173
-   ACCESS_TOKEN_SECRET=your_access_token_secret
-   ACCESS_TOKEN_EXPIRY=1d
-   REFRESH_TOKEN_SECRET=your_refresh_token_secret
-   REFRESH_TOKEN_EXPIRY=10d
-   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-   CLOUDINARY_API_KEY=your_cloudinary_api_key
-   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   ```
+The repo root has no app — Vercel must use `backend/` as its root:
 
-5. **Start the Development Servers**
+1. Project → **Settings → General → Root Directory** → `backend` → Save
+2. **Settings → Environment Variables** → add every key from `.env.sample`
+   (production values; `CORS_ORIGIN` = frontend URL, `FRONTEND_URL` = same)
+3. **Deployments → Redeploy**
 
-   Backend (Fully functional):
+The function entry is `api/index.js` (auto-built); `index.js` is local-only.
+Uploads use `/tmp` on Vercel — files over ~4.5MB on Hobby should upload
+direct to Cloudinary from the client.
 
-   ```bash
-   cd backend
-   npm run dev
-   ```
+## Scripts
 
-   Frontend (In development - basic structure):
+```bash
+# backend
+npm run dev      # nodemon + dotenv
+npm start        # node ./index.js
 
-   ```bash
-   cd frontend
-   npm run dev
-   ```
+# frontend
+npm run dev      # vite dev server
+npm run build    # production build (dist/)
+```
 
-6. **Access the Application**
-   - Backend API (Ready): http://localhost:8000
-   - Frontend (In progress): http://localhost:5173
+## Status
 
-## 📡 API Endpoints (✅ Backend Complete)
+- ✅ Backend API + OTP + password reset + Vercel/CORS hardening
+- ✅ Landing, auth flows, real-data library pages, help, SEO/llms.txt
+- 🚧 Video transcoding/quality options, notifications, recommendations
+- 🚧 Direct-to-Cloudinary uploads for large files on serverless
 
-### Authentication
+## Author
 
-- `POST /api/v1/users/register` - Register new user
-- `POST /api/v1/users/login` - User login
-- `POST /api/v1/users/logout` - User logout
-- `POST /api/v1/users/refresh-token` - Refresh access token
+**Prabhat Kumar** — [@Prabhat2912](https://github.com/Prabhat2912)
 
-### Videos
-
-- `GET /api/v1/videos` - Get all videos
-- `POST /api/v1/videos` - Upload new video
-- `GET /api/v1/videos/:videoId` - Get video by ID
-- `DELETE /api/v1/videos/:videoId` - Delete video
-
-### Users
-
-- `GET /api/v1/users/profile` - Get user profile
-- `PATCH /api/v1/users/update-account` - Update account details
-- `POST /api/v1/users/change-password` - Change password
-
-### Subscriptions
-
-- `POST /api/v1/subscriptions/:channelId` - Subscribe to channel
-- `GET /api/v1/subscriptions/user/:subscriberId` - Get user subscriptions
-
-### Comments, Likes, Playlists, Tweets, Dashboard
-
-- Complete API endpoints implemented for all features
-
-> **Note**: All backend endpoints are fully implemented and tested. You can test the API using tools like Postman or Thunder Client.
-
-## 🔧 Development
-
-### Available Scripts
-
-**Backend:**
-
-- `npm run dev` - Start development server with nodemon
-
-**Frontend:**
-
-- `npm run dev` - Start Vite development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-
-## 🤝 Contributing
-
-This is a learning project, but contributions are welcome! Please feel free to submit issues and pull requests.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 Learning Outcomes
-
-This backend-focused learning project demonstrates proficiency in:
-
-- **Backend Development** with Node.js and Express.js
-- **RESTful API** design and implementation
-- **Database Design** and MongoDB operations with Mongoose
-- **User Authentication** and authorization with JWT
-- **File Upload** and cloud storage integration with Cloudinary
-- **Middleware Development** for authentication and file handling
-- **Error Handling** and API response standardization
-- **Security Best Practices** including password hashing and CORS
-- **API Documentation** and project structure organization
-
-## 🐛 Current Status & Known Issues
-
-### Backend (Completed ✅)
-
-- All core features implemented and functional
-- Comprehensive API endpoints tested
-- Production-ready code structure
-
-### Frontend (In Progress 🚧)
-
-- [ ] Basic React components setup
-- [ ] Complete UI/UX implementation needed
-- [ ] Redux integration for state management
-- [ ] Responsive design implementation
-- [ ] Component optimization and styling
-
-### Remaining Features
-
-- [ ] **Live Streaming** capability (backend feature)
-
-## 🚧 Future Enhancements
-
-### Frontend Development (Priority)
-
-- [ ] Complete React frontend implementation
-- [ ] Responsive design with Tailwind CSS
-- [ ] User interface for all backend features
-- [ ] State management with Redux Toolkit
-- [ ] Video player component optimization
-
-### Backend Additions
-
-- [ ] **Live Streaming** feature implementation
-- [ ] Real-time notifications with WebSocket
-- [ ] Advanced search and recommendation algorithm
-- [ ] Video transcoding and quality options
-- [ ] Analytics and dashboard insights
-
-### Additional Features
-
-- [ ] Mobile application (React Native)
-- [ ] Progressive Web App (PWA) features
-- [ ] Advanced admin panel
-
-## 📄 License
-
-This project is licensed under the ISC License.
-
-## 👤 Author
-
-**Prabhat Kumar**
-
-- GitHub: [@Prabhat2912](https://github.com/Prabhat2912)
-
-## 🙏 Acknowledgments
-
-- **Special Thanks** to **[Hitesh Choudhary Sir](https://github.com/hiteshchoudhary)** for his excellent backend development course and mentorship
-- Thanks to the open-source community for providing amazing tools and libraries
-- Inspired by YouTube's functionality and user experience
-- Gratitude to all the developers who contribute to the MERN stack ecosystem
+Thanks to Hitesh Choudhary for the backend mentorship, and to the
+open-source community behind the MERN ecosystem.

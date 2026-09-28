@@ -16,6 +16,10 @@ import VideoPlayer from "./pages/Video-Player/videoPlayer";
 import VerifyOtp from "./pages/VerifyOtp/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import Subscriptions from "./pages/Subscriptions/subscriptions";
+import { Liked, Library } from "./pages/Library/library";
+import Settings from "./pages/Settings/settings";
+import Help from "./pages/Help/help";
 import Login from "./components/Login/Login";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -51,6 +55,17 @@ const routes = (
         path="profile"
         element={<ProtectedRoute element={<Profile />} />}
       />
+      <Route
+        path="subscriptions"
+        element={<ProtectedRoute element={<Subscriptions />} />}
+      />
+      <Route path="liked" element={<ProtectedRoute element={<Liked />} />} />
+      <Route path="library" element={<ProtectedRoute element={<Library />} />} />
+      <Route
+        path="settings"
+        element={<ProtectedRoute element={<Settings />} />}
+      />
+      <Route path="help" element={<Help />} />
       <Route path="search" element={<SearchView />} />
       {/* legacy alias */}
       <Route path="search-view" element={<SearchView />} />

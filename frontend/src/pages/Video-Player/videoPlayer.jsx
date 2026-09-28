@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { FiThumbsUp, FiThumbsDown, FiShare2, FiBookmark, FiCheck } from "react-icons/fi";
+import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import VideoCard, { formatViews } from "../../components/VideoCard/videoCard";
+import { CardsSkeleton, FeedError } from "../../components/FeedStates/FeedStates";
 import { videos } from "../../data/videos";
+import { feedApi, serverMessage } from "../../function/libraryApi";
+import { toCard, isApiId, timeAgo } from "../../function/format";
 import { usePageMeta, useJsonLd } from "../../function/pageMeta";
 
 const comments = [
@@ -13,28 +18,76 @@ const comments = [
 
 const VideoPlayer = () => {
   const { id } = useParams();
-  const current = videos[(Number(id) - 1 + videos.length) % videos.length] || videos[0];
+  const { isLogin } = useSelector(selectAuth);
+  const apiMode = isApiId(id);
+
+  // Catalog entries (guests) vs real network premieres (members).
+  const mock = !apiMode
+    ? videos[(Number(id) - 1 + videos.length) % videos.length] || videos[0]
+    : null;
+
+  const [live, setLive] = useState(null);
+  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState(apiMode ? "loading" : "idle");
+  const [error, setError] = useState(null);
+
   const [liked, setLiked] = useState(null);
   const [saved, setSaved] = useState(false);
   const [shared, setShared] = useState(false);
   const [draft, setDraft] = useState("");
   const [list, setList] = useState(comments);
 
-  usePageMeta(current.title, `Watch ${current.title} by ${current.channel} on PlayTube.`);
-  useJsonLd("video-jsonld", {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    name: current.title,
-    description: `${current.title} by ${current.channel} on PlayTube.`,
-    thumbnailUrl: [current.thumbnail],
-    uploadDate: new Date().toISOString().slice(0, 10),
-    duration: current.duration,
-    interactionStatistic: {
-      "@type": "InteractionCounter",
-      interactionType: "https://schema.org/WatchAction",
-      userInteractionCount: current.views,
-    },
-  });
+  useEffect(() => {
+    if (!apiMode) return;
+    if (!isLogin) {
+      setStatus("locked");
+      return;
+    }
+    let live = true;
+    setStatus("loading");
+    feedApi
+      .videoById(id)
+      .then((data) => {
+        if (!live) return;
+        setLive(toCard(data));
+        setFile(data?.videoFile || null);
+        setStatus("idle");
+      })
+      .catch((err) => {
+        if (!live) return;
+        setError(serverMessage(err, "Could not load this premiere."));
+        setStatus("error");
+      });
+    return () => {
+      live = false;
+    };
+  }, [apiMode, id, isLogin]);
+
+  const current = live || mock;
+
+  usePageMeta(
+    current?.title || "Watch",
+    current ? `Watch ${current.title} by ${current.channel} on PlayTube.` : "Watch on PlayTube."
+  );
+  useJsonLd(
+    "video-jsonld",
+    current
+      ? {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          name: current.title,
+          description: `${current.title} by ${current.channel} on PlayTube.`,
+          thumbnailUrl: [current.thumbnail],
+          uploadDate: (current.createdAt || new Date().toISOString()).slice(0, 10),
+          duration: current.duration,
+          interactionStatistic: {
+            "@type": "InteractionCounter",
+            interactionType: "https://schema.org/WatchAction",
+            userInteractionCount: current.views,
+          },
+        }
+      : null
+  );
 
   const share = async () => {
     try {
@@ -51,22 +104,63 @@ const VideoPlayer = () => {
     setDraft("");
   };
 
+  if (status === "loading") {
+    return (
+      <div className="w-full bg-void px-4 py-5 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="aspect-video animate-pulse rounded-2xl bg-white/5" />
+          <div className="mt-4 h-6 w-2/3 animate-pulse rounded bg-white/5" />
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "locked") {
+    return (
+      <div className="w-full bg-void px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-md rounded-3xl border border-line bg-panel p-8 text-center">
+          <p className="font-display text-xl font-bold text-zinc-100">Members-only premiere</p>
+          <p className="mt-2 text-sm leading-6 text-zinc-500">Log in to watch network premieres. Previews stay open to everyone.</p>
+          <Link to="/login" className="mt-5 block rounded-xl bg-ember py-3 text-sm font-bold text-white hover:bg-ember-bright">
+            Log in to watch
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "error" || !current) {
+    return (
+      <div className="w-full bg-void px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-2xl">
+          <FeedError message={error} onRetry={() => window.location.reload()} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full overflow-y-auto bg-void">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[1fr_340px]">
         <div>
           <div className="overflow-hidden rounded-2xl border border-line bg-black shadow-card">
-            <img src={current.thumbnail} alt={current.title} className="aspect-video w-full object-cover" />
+            {file ? (
+              <video src={file} poster={current.thumbnail} controls preload="metadata" className="aspect-video w-full" />
+            ) : (
+              <img src={current.thumbnail} alt={current.title} className="aspect-video w-full object-cover" />
+            )}
           </div>
-          <h1 className="mt-4 text-balance text-xl font-bold leading-7 tracking-tight text-zinc-100">{current.title}</h1>
+          <h1 className="mt-4 text-balance font-display text-xl font-bold leading-7 tracking-tight text-zinc-100">{current.title}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-3">
               <img src={current.avatar} alt={current.channel} className="h-10 w-10 rounded-full" />
               <div>
                 <p className="text-sm font-bold text-zinc-100">{current.channel}</p>
-                <p className="text-[12.5px] text-zinc-500">{formatViews(842000)} in the room</p>
+                <p className="text-[12.5px] text-zinc-500">
+                  {apiMode ? timeAgo(current.createdAt) || current.age : `${formatViews(842000)} in the room`}
+                </p>
               </div>
-              <button className="ml-2 h-9 rounded-full bg-ember px-5 text-sm font-bold text-void hover:bg-ember-bright">
+              <button className="ml-2 h-9 rounded-full bg-ember px-5 text-sm font-bold text-white hover:bg-ember-bright">
                 Follow
               </button>
             </div>
@@ -110,7 +204,7 @@ const VideoPlayer = () => {
           <section className="mt-6" aria-label="Comments">
             <h2 className="text-base font-bold text-zinc-100">{list.length} reactions</h2>
             <form onSubmit={post} className="mt-3 flex gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ember text-sm font-black text-void">Y</span>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ember font-display text-sm font-black text-white">Y</span>
               <div className="flex-1">
                 <input
                   value={draft}
@@ -121,8 +215,8 @@ const VideoPlayer = () => {
                 />
                 {draft && (
                   <div className="mt-2 flex justify-end gap-2">
-                    <button type="button" onClick={() => setDraft("")} className="h-9 rounded-full px-4 text-sm font-bold text-zinc-500 hover:bg-panel">Cancel</button>
-                    <button type="submit" className="h-9 rounded-full bg-ember px-5 text-sm font-bold text-void hover:bg-ember-bright">React</button>
+                    <button type="button" onClick={() => setDraft("")} className="h-9 rounded-full px-4 text-sm font-bold text-zinc-500 hover:bg-white/5">Cancel</button>
+                    <button type="submit" className="h-9 rounded-full bg-ember px-5 text-sm font-bold text-white hover:bg-ember-bright">React</button>
                   </div>
                 )}
               </div>

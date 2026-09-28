@@ -16,13 +16,23 @@
 - Login: `/login` — username-or-email plus password
 - Dashboard (login): `/dashboard` — channel stats and uploads
 - Profile (login): `/profile` — identity and watch-later library
+- Subscriptions (login): `/subscriptions` — followed channels, unfollow
+- Applauded (login): `/liked` — liked videos
+- Collections (login): `/library` — playlists
+- Settings (login): `/settings` — account, password, session tabs
+- Help: `/help` — FAQ accordion and troubleshooting
+- Forgot password: `/forgot-password` — reset link by email
+- Reset password: `/reset-password?token=` — set a new password
 
 ## API (backend, `/api/v1`)
 
 - Auth: `POST /users/register`, `POST /users/login`, `POST /users/logout`,
   `POST /users/refresh-token`
+- Feed data is the live API for members; guests see synthetic previews.
 - OTP: `POST /users/send-otp { email }`,
   `POST /users/verify-otp { email, otp }` (10-min codes, 5-attempt lockout)
+- Password: `POST /users/forgot-password { email }`,
+  `POST /users/reset-password { token, newPassword }` (15-min single-use)
 - Videos, comments, likes, playlists, subscriptions, tweets, dashboard:
   see backend `src/routes/`
 
