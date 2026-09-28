@@ -7,3 +7,8 @@ project.txt
 .cursor/
 .gemini/
 .impeccable/
+
+# AI product notes (local working docs, never commit)
+PRODUCT.md
+AGENTS.md
+CLAUDE.md
