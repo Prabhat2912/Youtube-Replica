@@ -37,6 +37,7 @@ const Landing = () => {
   // Rails read the shared feed cache — no second fetch after visiting home.
   useEffect(() => {
     dispatch(fetchFeed());
+    window.scrollTo(0, 0);
   }, [dispatch]);
 
   const featured = feed.items[0];

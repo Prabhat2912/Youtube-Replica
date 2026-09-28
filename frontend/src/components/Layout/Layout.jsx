@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Sidebar, { SidebarDrawerContent } from "../SideBar/sidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "../Header/header";
@@ -8,10 +8,17 @@ const Layout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const location = useLocation();
+  const mainRef = useRef(null);
 
   // Whatever opens the menu on phones, navigating must close it.
   useEffect(() => {
     setDrawer(false);
+  }, [location.pathname]);
+
+  // New page, top of the reel — reset both scroll containers.
+  useEffect(() => {
+    mainRef.current?.scrollTo?.(0, 0);
+    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   return (
@@ -27,7 +34,7 @@ const Layout = () => {
       />
       <div className="flex w-full">
         <Sidebar collapsed={collapsed} />
-        <main className="min-w-0 flex-1">
+        <main ref={mainRef} className="min-w-0 flex-1">
           <Outlet />
         </main>
       </div>
