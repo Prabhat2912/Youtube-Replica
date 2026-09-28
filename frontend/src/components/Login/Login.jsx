@@ -5,12 +5,14 @@ import { login, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
 import Logo from "../Brand/Logo";
+import { usePageMeta } from "../../function/pageMeta";
 
 const Login = ({ isModalOpen }) => {
   const [data, setData] = useState({ username: "", email: "", password: "" });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authState = useSelector(selectAuth);
+  usePageMeta("Log in", "Log in to PlayTube to pick up watching where you left off.");
 
   const handleData = (value) => {
     if (value.includes("@")) {

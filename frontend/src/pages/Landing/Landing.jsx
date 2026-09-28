@@ -4,8 +4,14 @@ import { FiPlay, FiCheck, FiArrowRight, FiShield, FiZap, FiUsers } from "react-i
 import Logo from "../../components/Brand/Logo";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { videos } from "../../data/videos";
+import { usePageMeta } from "../../function/pageMeta";
 
-const Landing = () => (
+const Landing = () => {
+  usePageMeta(
+    "A lighter home for video",
+    "PlayTube is a calm place to watch and share video — clean feed, trusted channels and email-verified accounts."
+  );
+  return (
   <div className="min-h-screen bg-stone-50 text-slate-900">
     <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
@@ -176,6 +182,7 @@ const Landing = () => (
       </div>
     </footer>
   </div>
-);
+  );
+};
 
 export default Landing;

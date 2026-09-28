@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { videos, categories } from "../../data/videos";
+import { usePageMeta } from "../../function/pageMeta";
 
 const Home = () => {
   const [active, setActive] = useState("All");
+  usePageMeta("Home feed", "Browse trending videos across music, coding, design, travel and more on PlayTube.");
   const list = useMemo(
     () => (active === "All" ? videos : videos.filter((v) => v.category === active)),
     [active]
@@ -11,6 +13,7 @@ const Home = () => {
 
   return (
     <div className="w-full overflow-y-auto bg-stone-50">
+      <h1 className="sr-only">PlayTube home feed — trending videos</h1>
       <div className="scroll-hidden sticky top-0 z-10 flex gap-2 overflow-x-auto bg-stone-50/95 px-4 py-3 backdrop-blur sm:px-6">
         {categories.map((c) => (
           <button

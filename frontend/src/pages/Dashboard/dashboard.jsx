@@ -5,12 +5,14 @@ import { FiUpload, FiPlay, FiFolder, FiThumbsUp } from "react-icons/fi";
 import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import { videos } from "../../data/videos";
 import VideoCard from "../../components/VideoCard/videoCard";
+import { usePageMeta } from "../../function/pageMeta";
 
 const stat = "rounded-2xl bg-white p-5 shadow-card";
 
 const Dashboard = () => {
   const authState = useSelector(selectAuth);
   const name = authState.user?.fullName || authState.user?.username || "Creator";
+  usePageMeta("Creator dashboard", "Your PlayTube channel stats, uploads and playlists at a glance.");
 
   return (
     <div className="w-full overflow-y-auto bg-stone-50 px-4 py-6 sm:px-6">

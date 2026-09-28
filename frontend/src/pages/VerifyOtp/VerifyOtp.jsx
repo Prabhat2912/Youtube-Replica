@@ -10,6 +10,7 @@ import {
   setEmail,
   selectOtp,
 } from "../../Redux/Features/Otp/OtpSlice";
+import { usePageMeta } from "../../function/pageMeta";
 
 const RESEND_SECONDS = 30;
 
@@ -23,6 +24,7 @@ const VerifyOtp = () => {
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(Boolean(otp.email));
   const [left, setLeft] = useState(0);
+  usePageMeta("Verify your email", "Enter the 6-digit code sent to your inbox to verify your PlayTube account.");
 
   useEffect(() => {
     if (!left) return;

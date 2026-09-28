@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+
+# Replace with your deployed frontend URL after first deploy
+Sitemap: https://playtube.vercel.app/sitemap.xml

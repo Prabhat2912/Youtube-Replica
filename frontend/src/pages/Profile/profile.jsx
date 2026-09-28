@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import { videos } from "../../data/videos";
 import VideoCard from "../../components/VideoCard/videoCard";
+import { usePageMeta } from "../../function/pageMeta";
 
 const Profile = () => {
   const authState = useSelector(selectAuth);
   const user = authState.user || {};
   const name = user.fullName || user.username || "Guest viewer";
   const initial = (name[0] || "G").toUpperCase();
+  usePageMeta("Your profile", "Your PlayTube identity, channel info and watch-later library.");
 
   return (
     <div className="w-full overflow-y-auto bg-stone-50">

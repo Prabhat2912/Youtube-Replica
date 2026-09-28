@@ -10,6 +10,7 @@ import uploadOnCloudinary from "../../function/cloudinary";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
 import Logo from "../Brand/Logo";
+import { usePageMeta } from "../../function/pageMeta";
 
 const field =
   "h-12 w-full rounded-xl border border-slate-200 bg-stone-50 px-4 text-[15px] text-slate-900 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100";
@@ -28,6 +29,7 @@ const SignUp = () => {
   const authState = useSelector(selectAuth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  usePageMeta("Create your account", "Join PlayTube free — verify your email and start uploading.");
 
   const handleImageChange = (event, imageType) => {
     const file = event.target.files[0];

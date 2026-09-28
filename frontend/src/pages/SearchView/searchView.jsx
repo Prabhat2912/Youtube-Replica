@@ -2,10 +2,15 @@ import React, { useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import VideoCard from "../../components/VideoCard/videoCard";
 import { videos } from "../../data/videos";
+import { usePageMeta } from "../../function/pageMeta";
 
 const SearchView = () => {
   const [params] = useSearchParams();
   const q = (params.get("q") || "").toLowerCase();
+  usePageMeta(
+    q ? `Results for ${params.get("q")}` : "Explore",
+    "Search PlayTube videos, channels and topics."
+  );
   const results = useMemo(() => {
     if (!q) return videos;
     return videos.filter(

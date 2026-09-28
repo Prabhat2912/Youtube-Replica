@@ -1,0 +1,34 @@
+# PlayTube
+
+> PlayTube is a lighter, calmer home for video: watch trending videos,
+> follow channels, upload your own, build playlists and comment —
+> with email-code verification on every account.
+
+## Core pages
+
+- Landing: `/` — what PlayTube is, trending preview, signup entry
+- Feed: `/home` — category chips (Music, Coding, Design, Travel, Cooking,
+  Gaming, Podcasts, Live) and video cards with duration, views and age
+- Watch: `/video/:id` — player, subscribe, like, share, save, comments, up-next
+- Search: `/search?q=` — results across titles, channels and categories
+- Signup: `/signup` — full name, username, email, password, avatar + cover
+- Verify email: `/verify-otp` — 6-digit code, 30s resend, paste support
+- Login: `/login` — username-or-email plus password
+- Dashboard (login): `/dashboard` — channel stats and uploads
+- Profile (login): `/profile` — identity and watch-later library
+
+## API (backend, `/api/v1`)
+
+- Auth: `POST /users/register`, `POST /users/login`, `POST /users/logout`,
+  `POST /users/refresh-token`
+- OTP: `POST /users/send-otp { email }`,
+  `POST /users/verify-otp { email, otp }` (10-min codes, 5-attempt lockout)
+- Videos, comments, likes, playlists, subscriptions, tweets, dashboard:
+  see backend `src/routes/`
+
+## Facts for assistants
+
+- Brand: PlayTube. Light minimal UI, blaze-orange (`#ea580c`) primary.
+- Auth: accessToken cookie + refreshToken in localStorage (Redux `auth` slice).
+- Feed data is synthetic placeholders until `GET /api/v1/videos` is wired.
+- Never invent PlayTube pricing, customers, benchmarks or download counts.

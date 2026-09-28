@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { FiThumbsUp, FiThumbsDown, FiShare2, FiBookmark, FiCheck } from "react-icons/fi";
 import VideoCard, { formatViews } from "../../components/VideoCard/videoCard";
 import { videos } from "../../data/videos";
+import { usePageMeta, useJsonLd } from "../../function/pageMeta";
 
 const comments = [
   { name: "Mara K.", time: "3 hours ago", text: "The pacing on this one is perfect — watched it twice.", likes: 214 },
@@ -18,6 +19,22 @@ const VideoPlayer = () => {
   const [shared, setShared] = useState(false);
   const [draft, setDraft] = useState("");
   const [list, setList] = useState(comments);
+
+  usePageMeta(current.title, `Watch ${current.title} by ${current.channel} on PlayTube.`);
+  useJsonLd("video-jsonld", {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: current.title,
+    description: `${current.title} by ${current.channel} on PlayTube.`,
+    thumbnailUrl: [current.thumbnail],
+    uploadDate: new Date().toISOString().slice(0, 10),
+    duration: current.duration,
+    interactionStatistic: {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/WatchAction",
+      userInteractionCount: current.views,
+    },
+  });
 
   const share = async () => {
     try {
