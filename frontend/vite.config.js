@@ -7,7 +7,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      // Updates take over on next visit by themselves — no missed prompt
+      // can strand a phone on a stale shell ever again.
+      registerType: 'autoUpdate',
+      cleanupOutdatedCaches: true,
       includeAssets: ['robots.txt', 'sitemap.xml', 'llms.txt', 'apple-touch-icon.png'],
       manifest: {
         name: 'PlayTube — after-dark screening room',

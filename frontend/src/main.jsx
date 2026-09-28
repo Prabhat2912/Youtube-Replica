@@ -7,16 +7,15 @@ import store from "./Redux/store.js";
 import { Toaster, toast } from "sonner";
 import { registerSW } from "virtual:pwa-register";
 
-// Prompt before swapping the service worker — never yank the rug.
+// Service worker takes over automatically (autoUpdate + clientsClaim),
+// so phones can never sit on a stale shell. Offline-ready toast doubles
+// as proof the worker actually registered on the device.
 registerSW({
-  onNeedRefresh() {
-    toast("A new cut of PlayTube is ready", {
-      description: "Reload to get the latest program.",
-      action: {
-        label: "Reload",
-        onClick: () => window.location.reload(),
-      },
-      duration: Infinity,
+  immediate: true,
+  onOfflineReady() {
+    toast.success("PlayTube saved for offline", {
+      description: "Shell, fonts and media now load without signal.",
+      duration: 4000,
     });
   },
 });
