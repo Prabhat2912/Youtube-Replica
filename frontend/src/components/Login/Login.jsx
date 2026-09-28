@@ -6,6 +6,7 @@ import { resetLibrary } from "../../Redux/Features/Library/librarySlice";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
 import Logo from "../Brand/Logo";
+import PasswordField from "../PasswordField/PasswordField";
 import { usePageMeta } from "../../function/pageMeta";
 
 const field =
@@ -76,8 +77,7 @@ const Login = ({ isModalOpen }) => {
             Password
             <Link to="/forgot-password" className="font-bold text-ember hover:text-ember-bright">Forgot ticket?</Link>
           </span>
-          <input
-            type="password"
+          <PasswordField
             placeholder="••••••••"
             autoComplete="current-password"
             className={field}

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { FiCheck } from "react-icons/fi";
 import Logo from "../../components/Brand/Logo";
+import PasswordField from "../../components/PasswordField/PasswordField";
 import BASE_URL from "../../../BaseURL";
 import { usePageMeta } from "../../function/pageMeta";
 
@@ -74,11 +75,11 @@ const ResetPassword = () => {
             <form onSubmit={save} className="mt-6 space-y-4">
               <label className="block">
                 <span className="mb-1.5 block text-sm font-bold text-zinc-300">New password</span>
-                <input type="password" required value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" autoComplete="new-password" className={field} />
+                <PasswordField required value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" autoComplete="new-password" className={field} />
               </label>
               <label className="block">
                 <span className="mb-1.5 block text-sm font-bold text-zinc-300">Repeat it</span>
-                <input type="password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="••••••••" autoComplete="new-password" className={field} />
+                <PasswordField required value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="••••••••" autoComplete="new-password" className={field} />
               </label>
               {mismatch && <p role="alert" className="text-sm text-gold-hot">The two passwords don't match yet.</p>}
               {error && <p role="alert" className="text-sm text-gold-hot">{error}</p>}

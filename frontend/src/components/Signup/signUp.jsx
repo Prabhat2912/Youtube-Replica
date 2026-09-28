@@ -10,6 +10,7 @@ import uploadOnCloudinary from "../../function/cloudinary";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
 import Logo from "../Brand/Logo";
+import PasswordField from "../PasswordField/PasswordField";
 import { usePageMeta } from "../../function/pageMeta";
 
 const field =
@@ -107,7 +108,7 @@ const SignUp = () => {
         </label>
         <label className="mt-4 block">
           <span className="mb-1.5 block text-sm font-bold text-zinc-300">Password</span>
-          <input type="password" required placeholder="At least 8 characters" autoComplete="new-password" className={field}
+          <PasswordField required placeholder="At least 8 characters" autoComplete="new-password" className={field}
             onChange={(e) => setData({ ...data, password: e.target.value })} />
         </label>
 

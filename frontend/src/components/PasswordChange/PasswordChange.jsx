@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
+import PasswordField from "../PasswordField/PasswordField";
 
 const PasswordChange = ({ isModalOpen }) => {
   const profileState = useSelector(selectProfile);
@@ -45,16 +46,14 @@ const PasswordChange = ({ isModalOpen }) => {
         className="flex flex-col gap-4"
         onSubmit={handlePassChange}
       >
-        <input
-          type="password"
+        <PasswordField
           className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           placeholder="Enter old password"
           onChange={(e) => {
             setPass({ ...pass, oldPassword: e.target.value });
           }}
         />
-        <input
-          type="password"
+        <PasswordField
           className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-ember/60 focus:ring-2 focus:ring-ember/15"
           placeholder="Enter new password"
           onChange={(e) => {
