@@ -44,15 +44,15 @@ const UpdateAccount = ({ isModalOpen }) => {
   };
 
   return (
-    <div className="w-80 flex flex-col  mt-2 rounded-md gap-6 ">
-      <h1>Update Account Details</h1>
+    <div className="flex w-80 flex-col gap-4">
+      <h1 className="text-lg font-black text-zinc-100">Update account</h1>
       <form
-        className="flex flex-col justify-center bg-gray-200  rounded-md  p-4 gap-6"
+        className="flex flex-col gap-4"
         onSubmit={handleAccountUpdate}
       >
         <input
           type="text"
-          className="px-4 py-2 rounded-md outline-none "
+          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
           placeholder="Enter full name"
           onChange={(e) => {
             setData({ ...data, fullName: e.target.value });
@@ -60,7 +60,7 @@ const UpdateAccount = ({ isModalOpen }) => {
         />
         <input
           type="email"
-          className="px-4 py-2 rounded-md outline-none "
+          className="h-12 rounded-xl border border-line bg-void px-4 text-sm text-zinc-100 outline-none transition focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
           placeholder="Enter new email"
           onChange={(e) => {
             setData({ ...data, email: e.target.value });
@@ -68,19 +68,17 @@ const UpdateAccount = ({ isModalOpen }) => {
         />
         <button
           type="submit"
-          className={`px-4 py-2 rounded-md bg-gray-900 ${
-            profileState.isLoading ? "" : "hover:bg-gray-500"
-          }  text-white transition-all h-10 duration-150 ease-in`}
+          className="grid h-11 place-items-center rounded-xl bg-lime text-sm font-bold text-void transition hover:bg-lime-bright disabled:opacity-60"
           onClick={handleAccountUpdate}
         >
           {profileState.isLoading ? (
             <ScaleLoader
               loading={profileState.isLoading}
-              color="white"
+              color="#0A0A0F"
               height={20}
             />
           ) : (
-            ` Update Details`
+            `Update details`
           )}
         </button>
       </form>

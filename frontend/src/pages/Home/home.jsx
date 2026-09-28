@@ -12,18 +12,18 @@ const Home = () => {
   );
 
   return (
-    <div className="w-full overflow-y-auto bg-stone-50">
-      <h1 className="sr-only">PlayTube home feed — trending videos</h1>
-      <div className="scroll-hidden sticky top-0 z-10 flex gap-2 overflow-x-auto bg-stone-50/95 px-4 py-3 backdrop-blur sm:px-6">
+    <div className="w-full overflow-y-auto bg-void">
+      <h1 className="sr-only">PlayTube screening room — trending videos</h1>
+      <div className="scroll-hidden sticky top-0 z-10 flex gap-2 overflow-x-auto bg-void/95 px-4 py-3 backdrop-blur sm:px-6">
         {categories.map((c) => (
           <button
             key={c}
             onClick={() => setActive(c)}
             aria-pressed={active === c}
-            className={`h-9 shrink-0 rounded-full px-4 text-sm font-medium transition ${
+            className={`h-9 shrink-0 rounded-full px-4 text-sm font-bold transition ${
               active === c
-                ? "bg-slate-900 text-white"
-                : "bg-white text-slate-600 shadow-card hover:bg-slate-100"
+                ? "bg-lime text-void"
+                : "border border-line bg-panel text-zinc-400 hover:border-zinc-600 hover:text-zinc-100"
             }`}
           >
             {c}
@@ -36,7 +36,7 @@ const Home = () => {
         ))}
       </div>
       {!list.length && (
-        <p className="px-6 pb-10 text-sm text-slate-500">
+        <p className="px-6 pb-10 text-sm text-zinc-500">
           Nothing in {active} yet — showing everything instead.
         </p>
       )}

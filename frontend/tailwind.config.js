@@ -4,17 +4,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: "#fff7ed",
-          100: "#ffedd5",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410e",
+        void: "#0A0A0F",
+        panel: "#14141C",
+        line: "#26262F",
+        lime: {
+          DEFAULT: "#C8FF2E",
+          bright: "#DBFF5C",
+          dim: "#9DC22A",
         },
-        ink: {
-          500: "#64748b",
-          700: "#334155",
-          900: "#0f172a",
+        blaze: {
+          DEFAULT: "#FF5A1F",
+          hot: "#FF6E3D",
+        },
+        brand: {
+          50: "#f7fee7",
+          100: "#ecfccb",
+          500: "#a3e635",
+          600: "#65a30d",
+          700: "#4d7c0f",
         },
       },
       fontFamily: {
@@ -29,11 +36,9 @@ export default {
         ],
       },
       boxShadow: {
-        card: "0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px -12px rgb(15 23 42 / 0.18)",
-        pop: "0 12px 40px -12px rgb(15 23 42 / 0.28)",
-      },
-      borderRadius: {
-        "2xl": "1.1rem",
+        card: "0 1px 0 rgb(255 255 255 / 0.04), 0 16px 40px -20px rgb(0 0 0 / 0.8)",
+        glow: "0 0 28px -6px rgb(200 255 46 / 0.5)",
+        glowblaze: "0 0 28px -6px rgb(255 90 31 / 0.55)",
       },
     },
   },

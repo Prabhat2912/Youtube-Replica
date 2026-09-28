@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiSearch, FiUpload, FiMenu } from "react-icons/fi";
-import Cookies from "js-cookie";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../Redux/Features/Auth/AuthSlice";
 import Logo from "../Brand/Logo";
 import Modal from "../Modal/Modal";
 import Login from "../Login/Login";
@@ -11,7 +10,6 @@ import Dropdown from "../Dropdown/Dropdown";
 
 const Header = ({ onMenuClick }) => {
   const authState = useSelector(selectAuth);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -36,10 +34,10 @@ const Header = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/90 px-3 backdrop-blur sm:px-5">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-void/90 px-3 backdrop-blur sm:px-5">
       <button
         onClick={onMenuClick}
-        className="grid h-10 w-10 place-items-center rounded-full text-slate-600 hover:bg-slate-100"
+        className="grid h-10 w-10 place-items-center rounded-full text-zinc-400 hover:bg-panel hover:text-zinc-100"
         aria-label="Toggle menu"
       >
         <FiMenu size={20} />
@@ -48,18 +46,18 @@ const Header = ({ onMenuClick }) => {
 
       <form onSubmit={submitSearch} className="mx-auto hidden w-full max-w-xl items-center md:flex" role="search">
         <div className="relative w-full">
-          <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             type="search"
-            placeholder="Search videos, channels, topics"
+            placeholder="Search films, channels, moods"
             aria-label="Search videos"
-            className="h-11 w-full rounded-full border border-slate-200 bg-stone-50 pl-11 pr-24 text-sm text-slate-900 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+            className="h-11 w-full rounded-full border border-line bg-panel pl-11 pr-24 text-sm text-zinc-100 outline-none transition focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
           />
           <button
             type="submit"
-            className="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-700"
+            className="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-lime px-4 text-sm font-bold text-void hover:bg-lime-bright"
           >
             Search
           </button>
@@ -71,7 +69,7 @@ const Header = ({ onMenuClick }) => {
           <>
             <Link
               to="/dashboard"
-              className="hidden h-10 items-center gap-2 rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-full border border-line bg-panel px-4 text-sm font-semibold text-zinc-200 hover:border-zinc-600 sm:flex"
             >
               <FiUpload /> Upload
             </Link>
@@ -79,7 +77,7 @@ const Header = ({ onMenuClick }) => {
               <button onClick={() => setShowDropdown((v) => !v)} aria-label="Account menu">
                 <img
                   src={authState.user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=You`}
-                  className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+                  className="h-10 w-10 rounded-full border border-line object-cover"
                   alt="Your profile"
                 />
               </button>
@@ -88,12 +86,12 @@ const Header = ({ onMenuClick }) => {
           </>
         ) : (
           <>
-            <Link to="/login" className="hidden h-10 items-center rounded-full px-4 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:flex">
+            <Link to="/login" className="hidden h-10 items-center rounded-full px-4 text-sm font-semibold text-zinc-400 hover:bg-panel hover:text-zinc-100 sm:flex">
               Log in
             </Link>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="h-10 rounded-full bg-orange-600 px-5 text-sm font-semibold text-white shadow-card hover:bg-orange-500"
+              className="h-10 rounded-full bg-lime px-5 text-sm font-bold text-void shadow-glow hover:bg-lime-bright"
             >
               Get started
             </button>

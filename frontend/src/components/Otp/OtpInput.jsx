@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 const LEN = 6;
 
-// Six-box OTP input: auto-advance, backspace rewind, whole-code paste,
+// Six-box ticket input: auto-advance, backspace rewind, whole-code paste,
 // arrow navigation. All boxes share one value string owned by the parent.
 const OtpInput = ({ value, onChange, disabled, error }) => {
   const refs = useRef([]);
@@ -52,10 +52,10 @@ const OtpInput = ({ value, onChange, disabled, error }) => {
           <input
             key={i}
             ref={(el) => (refs.current[i] = el)}
-            className={`otp-box h-12 w-11 rounded-xl border bg-white text-center text-lg font-bold text-slate-900 outline-none transition sm:h-[52px] sm:w-12 ${
+            className={`otp-box h-12 w-11 rounded-xl border bg-void text-center text-lg font-black text-lime outline-none transition sm:h-[52px] sm:w-12 ${
               error
-                ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
-                : "border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                ? "border-blaze focus:border-blaze-hot focus:ring-2 focus:ring-blaze/20"
+                : "border-line focus:border-lime/60 focus:ring-2 focus:ring-lime/15"
             }`}
             inputMode="numeric"
             autoComplete={i === 0 ? "one-time-code" : "off"}

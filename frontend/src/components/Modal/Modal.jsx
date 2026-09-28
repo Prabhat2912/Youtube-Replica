@@ -1,14 +1,16 @@
 import React from "react";
 import { RxCross2 } from "react-icons/rx";
+
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="absolute bg-white rounded-lg shadow-lg p-5">
+    <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black/75 p-4">
+      <div className="relative w-full max-w-md rounded-3xl border border-line bg-panel p-6 shadow-card">
         <button
-          className="absolute top-0 right-0 bg-none border-none cursor-pointer p-2"
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full text-zinc-400 hover:bg-void hover:text-zinc-100"
           onClick={onClose}
+          aria-label="Close"
         >
           <RxCross2 />
         </button>

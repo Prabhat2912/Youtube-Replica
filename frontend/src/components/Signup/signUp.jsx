@@ -13,7 +13,7 @@ import Logo from "../Brand/Logo";
 import { usePageMeta } from "../../function/pageMeta";
 
 const field =
-  "h-12 w-full rounded-xl border border-slate-200 bg-stone-50 px-4 text-[15px] text-slate-900 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100";
+  "h-12 w-full rounded-xl border border-line bg-void px-4 text-[15px] text-zinc-100 outline-none transition focus:border-lime/60 focus:ring-2 focus:ring-lime/15";
 
 const SignUp = () => {
   const [data, setData] = useState({
@@ -63,7 +63,6 @@ const SignUp = () => {
             );
             if (loginResponse.payload) {
               resolve("ok");
-              // New accounts confirm email before full access
               navigate("/verify-otp", { state: { email: data.email, next: "/home" } });
             } else {
               reject(new Error("Registered, but automatic login failed. Please log in."));
@@ -76,54 +75,54 @@ const SignUp = () => {
         }
       });
     toast.promise(signUpPromise, {
-      loading: "Creating your account…",
-      success: "Account created — check your inbox for the code",
+      loading: "Printing your ticket…",
+      success: "Seat claimed — check your inbox for the code",
       error: (error) => `Error: ${error.message}`,
     });
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center bg-stone-50 px-4 py-10">
+    <div className="flex min-h-screen w-full flex-col items-center bg-void px-4 py-10">
       <Logo />
-      <form onSubmit={handleSignUp} className="mt-6 w-full max-w-md rounded-2xl bg-white p-8 shadow-pop">
-        <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
-        <p className="mt-1 text-sm text-slate-500">Free forever. Verify your email to start uploading.</p>
+      <form onSubmit={handleSignUp} className="mt-6 w-full max-w-md rounded-3xl border border-line bg-panel p-8 shadow-card">
+        <h1 className="text-2xl font-black tracking-tight text-zinc-100">Claim your seat</h1>
+        <p className="mt-1 text-sm text-zinc-500">Free forever. Verify your email to start premiering.</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Full name</span>
+            <span className="mb-1.5 block text-sm font-bold text-zinc-300">Full name</span>
             <input type="text" required placeholder="Aarav Sharma" className={field}
               onChange={(e) => setData({ ...data, fullName: e.target.value })} />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Username</span>
+            <span className="mb-1.5 block text-sm font-bold text-zinc-300">Username</span>
             <input type="text" required placeholder="aarav" className={field}
               onChange={(e) => setData({ ...data, username: e.target.value })} />
           </label>
         </div>
         <label className="mt-4 block">
-          <span className="mb-1.5 block text-sm font-semibold text-slate-700">Email</span>
+          <span className="mb-1.5 block text-sm font-bold text-zinc-300">Email</span>
           <input type="email" required placeholder="you@example.com" autoComplete="email" className={field}
             onChange={(e) => setData({ ...data, email: e.target.value })} />
         </label>
         <label className="mt-4 block">
-          <span className="mb-1.5 block text-sm font-semibold text-slate-700">Password</span>
+          <span className="mb-1.5 block text-sm font-bold text-zinc-300">Password</span>
           <input type="password" required placeholder="At least 8 characters" autoComplete="new-password" className={field}
             onChange={(e) => setData({ ...data, password: e.target.value })} />
         </label>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Avatar</span>
+            <span className="mb-1.5 block text-sm font-bold text-zinc-300">Avatar</span>
             <input type="file" accept="image/*"
-              className="w-full rounded-xl border border-dashed border-slate-300 bg-stone-50 px-3 py-2.5 text-sm file:mr-2 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-white"
+              className="w-full rounded-xl border border-dashed border-line bg-void px-3 py-2.5 text-sm text-zinc-400 file:mr-2 file:rounded-lg file:border-0 file:bg-lime file:px-3 file:py-1.5 file:font-bold file:text-void"
               onChange={(e) => { setImages({ ...images, avatarFile: e.target.files[0] }); handleImageChange(e, "avatar"); }} />
             {preview?.avatar && <img alt="Avatar preview" src={preview.avatar} className="mt-2 h-14 w-14 rounded-full object-cover" />}
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-700">Cover image</span>
+            <span className="mb-1.5 block text-sm font-bold text-zinc-300">Cover image</span>
             <input type="file" accept="image/*"
-              className="w-full rounded-xl border border-dashed border-slate-300 bg-stone-50 px-3 py-2.5 text-sm file:mr-2 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-white"
+              className="w-full rounded-xl border border-dashed border-line bg-void px-3 py-2.5 text-sm text-zinc-400 file:mr-2 file:rounded-lg file:border-0 file:bg-lime file:px-3 file:py-1.5 file:font-bold file:text-void"
               onChange={(e) => { setImages({ ...images, coverImageFile: e.target.files[0] }); handleImageChange(e, "coverImage"); }} />
             {preview?.coverImage && <img alt="Cover preview" src={preview.coverImage} className="mt-2 h-14 w-full rounded-lg object-cover" />}
           </label>
@@ -131,13 +130,13 @@ const SignUp = () => {
 
         <button
           type="submit"
-          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-orange-600 text-[15px] font-semibold text-white transition hover:bg-orange-500 disabled:opacity-60"
+          className="mt-6 grid h-12 w-full place-items-center rounded-xl bg-lime text-[15px] font-bold text-void transition hover:bg-lime-bright disabled:opacity-60"
           disabled={authState.isLoading}
         >
-          {authState.isLoading ? <ScaleLoader loading color="white" height={20} /> : "Sign up"}
+          {authState.isLoading ? <ScaleLoader loading color="#0A0A0F" height={20} /> : "Claim seat"}
         </button>
-        <p className="mt-4 text-center text-sm text-slate-500">
-          Have an account? <Link to="/login" className="font-semibold text-orange-600 hover:text-orange-500">Log in</Link>
+        <p className="mt-4 text-center text-sm text-zinc-500">
+          Have a ticket? <Link to="/login" className="font-bold text-lime hover:text-lime-bright">Log in</Link>
         </p>
       </form>
     </div>

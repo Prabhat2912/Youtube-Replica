@@ -22,15 +22,15 @@ const SearchView = () => {
   }, [q]);
 
   return (
-    <div className="w-full overflow-y-auto bg-stone-50 px-4 py-6 sm:px-6">
-      <h1 className="text-xl font-bold tracking-tight">
+    <div className="w-full overflow-y-auto bg-void px-4 py-6 sm:px-6">
+      <h1 className="text-xl font-black tracking-tight text-zinc-100">
         {q ? (
-          <>Results for <span className="text-orange-600">“{params.get("q")}”</span></>
+          <>Results for <span className="text-lime">“{params.get("q")}”</span></>
         ) : (
           "Explore everything"
         )}
       </h1>
-      <p className="mt-1 text-sm text-slate-500">{results.length} videos · wired to GET /api/v1/videos next</p>
+      <p className="mt-1 text-sm text-zinc-500">{results.length} screenings · wired to GET /api/v1/videos next</p>
       {results.length ? (
         <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((v) => (
@@ -38,10 +38,10 @@ const SearchView = () => {
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl bg-white p-10 text-center shadow-card">
-          <p className="font-semibold">No matches for “{params.get("q")}”.</p>
-          <p className="mt-1 text-sm text-slate-500">Try a channel name, topic or category.</p>
-          <Link to="/home" className="mt-4 inline-block rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white">Back to feed</Link>
+        <div className="mt-8 rounded-2xl border border-line bg-panel p-10 text-center">
+          <p className="font-bold text-zinc-100">No matches for “{params.get("q")}”.</p>
+          <p className="mt-1 text-sm text-zinc-500">Try a channel name, topic or category.</p>
+          <Link to="/home" className="mt-4 inline-block rounded-full bg-lime px-6 py-2.5 text-sm font-bold text-void">Back to the program</Link>
         </div>
       )}
     </div>

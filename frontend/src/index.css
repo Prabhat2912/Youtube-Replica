@@ -3,37 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --brand: #ea580c;
-  --ink: #0f172a;
+  --lime: #c8ff2e;
+  --blaze: #ff5a1f;
+  --void: #0a0a0f;
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  color-scheme: dark;
 }
 
 body {
-  @apply bg-stone-50 text-slate-900 antialiased;
+  @apply bg-void text-zinc-100 antialiased;
   font-feature-settings: "cv11", "ss01";
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: #ea580c;
-  color: #fff;
+  background: #c8ff2e;
+  color: #0a0a0f;
 }
 
 :focus-visible {
-  outline: 2px solid #ea580c;
+  outline: 2px solid #c8ff2e;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-input {
-  caret-color: #ea580c;
+input,
+textarea {
+  caret-color: #c8ff2e;
 }
 
 input::placeholder {
-  color: #94a3b8;
+  color: #52525b;
   opacity: 1;
 }
 
@@ -42,15 +45,15 @@ input::placeholder {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #0a0a0f;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #2e2e38;
   border-radius: 8px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid #0a0a0f;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #3f3f4c;
 }
 
 .scroll-hidden {
@@ -69,9 +72,62 @@ input::placeholder {
 }
 
 .otp-box {
-  caret-color: #ea580c;
+  caret-color: #c8ff2e;
   font-variant-numeric: tabular-nums;
 }
 .otp-box:disabled {
   opacity: 0.6;
+}
+
+/* The one authored motion: the marquee tape. Everything else stays still. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-x 28s linear infinite;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bulb-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 8px 1px rgb(200 255 46 / 0.7);
+  }
+  50% {
+    opacity: 0.25;
+    box-shadow: none;
+  }
+}
+
+.bulb {
+  animation: bulb-twinkle 2.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .rise,
+  .bulb {
+    animation: none;
+  }
 }
