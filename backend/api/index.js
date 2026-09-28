@@ -1,11 +1,21 @@
 import "../src/utils/nodeCompat.js";
 import connectDB from "../src/db/index.js";
 import { app } from "../src/app.js";
+import { setCorsHeaders, isPreflight } from "../src/utils/cors.js";
 
 // Vercel serverless entry. Files under `api/` are auto-built into
 // Serverless Functions; a root-level index.js with only `rewrites`
 // produces NO function (platform 404). NEVER call app.listen() here.
 export default async function handler(req, res) {
+  // CORS on every path, including failures below.
+  setCorsHeaders(req, res);
+
+  // Preflights never need the database — answer immediately so a
+  // cold DB can never turn into a CORS error in the browser.
+  if (isPreflight(req)) {
+    return res.status(204).end();
+  }
+
   // Let probes answer even if the DB env var is missing,
   // so deployments can be verified before MongoDB is wired.
   const url = req.url || "";

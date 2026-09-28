@@ -1,16 +1,13 @@
 import "./utils/nodeCompat.js";
 import express from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
+import { corsMiddleware } from "./utils/cors.js";
 
 const app = express();
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN?.split(",").map((s) => s.trim()) || true,
-    credentials: true,
-  })
-);
+// CORS FIRST — before every route, 404 and error handler, so no
+// response ever leaves without Access-Control-Allow-Origin.
+app.use(corsMiddleware);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
