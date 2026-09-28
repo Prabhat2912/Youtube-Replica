@@ -51,12 +51,17 @@ export const feedApi = {
   videos: (params) => pubGet("/videos", params),
   videoById: (id) => pubGet(`/videos/${id}`),
   comments: (videoId, params) => pubGet(`/comments/${videoId}`, params),
+  latestTweets: () => pubGet("/tweets/latest"),
+  userTweets: (userId) => pubGet(`/tweets/user/${userId}`),
   // authed writes + private reads
   videoByIdAuth: (id) => get(`/videos/${id}`),
   likedVideos: () => get("/likes/videos"),
   toggleVideoLike: (videoId) => post(`/likes/toggle/v/${videoId}`),
   toggleCommentLike: (commentId) => post(`/likes/toggle/c/${commentId}`),
   addComment: (videoId, content) => post(`/comments/${videoId}`, { content }),
+  createTweet: (content) => post("/tweets", { content }),
+  updateTweet: (tweetId, content) => patch(`/tweets/${tweetId}`, { content }),
+  toggleTweetLike: (tweetId) => post(`/likes/toggle/t/${tweetId}`),
   subscriptions: (userId) => get(`/subscriptions/c/${userId}`),
   toggleSubscription: (channelId) => post(`/subscriptions/c/${channelId}`),
   playlists: (userId) => get(`/playlist/user/${userId}`),
@@ -65,6 +70,14 @@ export const feedApi = {
   addToPlaylist: (videoId, playlistId) => patch(`/playlist/add/${videoId}/${playlistId}`),
   removeFromPlaylist: (videoId, playlistId) => patch(`/playlist/remove/${videoId}/${playlistId}`),
   history: () => get("/users/history"),
+
+  async deleteTweet(tweetId) {
+    const res = await axios.delete(`${BASE_URL}/tweets/${tweetId}`, {
+      headers: authHeaders(),
+      timeout: 15000,
+    });
+    return res.data?.data;
+  },
 
   // "Keep" shelf: one Watch Later collection per member.
   async watchLaterId() {

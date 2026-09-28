@@ -1,9 +1,31 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Tweet } from "../models/tweet.model.js";
 import { User } from "../models/user.model.js";
+import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+
+const withMeta = async (tweets) =>
+  Promise.all(
+    tweets.map(async (t) => ({
+      ...t.toObject(),
+      likesCount: await Like.countDocuments({ tweet: t._id }),
+    }))
+  );
+
+// Public: freshest shouts across the network.
+const getLatestTweets = asyncHandler(async (req, res) => {
+  const { limit = 20 } = req.query;
+  const tweets = await Tweet.find()
+    .sort({ createdAt: -1 })
+    .limit(Math.min(parseInt(limit) || 20, 50))
+    .populate("owner", "fullName username avatar");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, await withMeta(tweets), "Latest shouts fetched"));
+});
 
 const createTweet = asyncHandler(async (req, res) => {
   //TODO: create tweet
@@ -40,11 +62,13 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
   const tweets = await Tweet.find({
     owner: userId,
-  });
+  })
+    .sort({ createdAt: -1 })
+    .populate("owner", "fullName username avatar");
 
   return res
     .status(200)
-    .json(new ApiResponse(200, tweets, "Tweets fetched suucessfully"));
+    .json(new ApiResponse(200, await withMeta(tweets), "Tweets fetched suucessfully"));
 });
 
 const updateTweet = asyncHandler(async (req, res) => {
@@ -113,4 +137,4 @@ const deleteTweet = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Tweet deleted successfully"));
 });
 
-export { createTweet, getUserTweets, updateTweet, deleteTweet };
+export { createTweet, getUserTweets, getLatestTweets, updateTweet, deleteTweet };

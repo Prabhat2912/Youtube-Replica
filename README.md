@@ -48,6 +48,8 @@ Built by **Prabhat Kumar** while learning backend development from
 - `/search?q=` — live results across titles, channels, descriptions
 - `/subscriptions` — followed channels with working unfollow
 - `/liked` (Applauded), `/library` (Collections/playlists)
+- `/shouts` — backstage mic: post, edit, delete and like short notes;
+  Latest (public) + Mine tabs, 280 chars
 - `/profile` — real watch history (`GET /users/history`)
 - `/dashboard` — uploads + **live-counted stats** (views, applause,
   collections, premieres)
@@ -166,6 +168,11 @@ VITE_UPLOAD_PRESET=<preset>
 | GET    | `/api/v1/subscriptions/c/:channelId`  | ✅   | Followed channels    |
 | POST   | `/api/v1/subscriptions/c/:channelId`  | ✅   | Follow/unfollow      |
 | GET    | `/api/v1/playlist/user/:userId`       | ✅   | Collections          |
+| GET    | `/api/v1/tweets/latest`               | – (public) | Freshest shouts  |
+| GET    | `/api/v1/tweets/user/:userId`         | – (public) | Member shouts    |
+| POST   | `/api/v1/tweets`                      | ✅   | Post a shout         |
+| PATCH  | `/api/v1/tweets/:tweetId`             | ✅   | Edit own shout       |
+| DELETE | `/api/v1/tweets/:tweetId`             | ✅   | Delete own shout     |
 | GET    | `/api/v1/healthcheck`                 | –    | Health probe         |
 
 List endpoints populate owners/channels (`fullName username avatar`).

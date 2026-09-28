@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { RiHome6Line } from "react-icons/ri";
 import { MdOutlineExplore, MdOutlineSubscriptions } from "react-icons/md";
-import { FiThumbsUp, FiFolder, FiSettings } from "react-icons/fi";
+import { FiThumbsUp, FiFolder, FiSettings, FiMessageSquare } from "react-icons/fi";
 import { BiHelpCircle } from "react-icons/bi";
 
 const linkCls = ({ isActive }) =>
@@ -30,6 +30,9 @@ const Rail = ({ collapsed, onNavigate }) => (
       </NavLink>
       <NavLink to="/library" className={linkCls} onClick={onNavigate}>
         <FiFolder size={18} /> {!collapsed && "Collections"}
+      </NavLink>
+      <NavLink to="/shouts" className={linkCls} onClick={onNavigate}>
+        <FiMessageSquare size={18} /> {!collapsed && "Shouts"}
       </NavLink>
     </nav>
     {!collapsed && (

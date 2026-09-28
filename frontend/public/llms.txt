@@ -20,6 +20,7 @@
 - Subscriptions (login): `/subscriptions` — followed channels, unfollow
 - Applauded (login): `/liked` — liked videos
 - Collections (login): `/library` — playlists
+- Shouts: `/shouts` — Latest (public) + Mine tabs; post/edit/delete/like
 - Settings (login): `/settings` — account, password, session tabs
 - Help: `/help` — FAQ accordion and troubleshooting
 - Forgot password: `/forgot-password` — reset link by email

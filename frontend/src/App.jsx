@@ -21,6 +21,7 @@ import { Liked, Library } from "./pages/Library/library";
 import Settings from "./pages/Settings/settings";
 import Help from "./pages/Help/help";
 import Upload from "./pages/Upload/upload";
+import Shouts from "./pages/Shouts/shouts";
 import Login from "./components/Login/Login";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -67,6 +68,7 @@ const routes = (
         element={<ProtectedRoute element={<Settings />} />}
       />
       <Route path="upload" element={<ProtectedRoute element={<Upload />} />} />
+      <Route path="shouts" element={<Shouts />} />
       <Route path="help" element={<Help />} />
       <Route path="search" element={<SearchView />} />
       {/* legacy alias */}
