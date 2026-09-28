@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import { resetLibrary } from "../../Redux/Features/Library/librarySlice";
 import { toast } from "sonner";
 import { ScaleLoader } from "react-spinners";
 import Logo from "../Brand/Logo";
@@ -32,6 +33,8 @@ const Login = ({ isModalOpen }) => {
         try {
           const res = await dispatch(login(data));
           if (res?.payload?.user) {
+            // Fresh account, fresh cache (covers account switching).
+            dispatch(resetLibrary());
             navigate("/home");
             isModalOpen?.(false);
             resolve(res.payload);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectAuth, setUser } from "../../Redux/Features/Auth/AuthSlice";
+import { resetLibrary } from "../../Redux/Features/Library/librarySlice";
 import UpdateAccount from "../../components/UpdateAccount/UpdateAccount";
 import PasswordChange from "../../components/PasswordChange/PasswordChange";
 import { feedApi, serverMessage } from "../../function/libraryApi";
@@ -106,7 +107,10 @@ const Settings = () => {
               collections and subscriptions stay on your account.
             </p>
             <button
-              onClick={() => dispatch(logout())}
+              onClick={() => {
+                dispatch(logout());
+                dispatch(resetLibrary());
+              }}
               className="mt-4 h-11 w-full rounded-xl border border-ember/50 font-bold text-ember hover:bg-ember/10"
             >
               Log out everywhere here

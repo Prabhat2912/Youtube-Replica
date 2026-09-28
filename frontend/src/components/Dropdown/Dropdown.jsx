@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectAuth } from "../../Redux/Features/Auth/AuthSlice";
+import { resetLibrary } from "../../Redux/Features/Library/librarySlice";
 import { toast } from "sonner";
 import Modal from "../Modal/Modal";
 import PasswordChange from "../PasswordChange/PasswordChange";
@@ -12,6 +13,7 @@ const Dropdown = ({ isOpen }) => {
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(resetLibrary());
     toast.success("Logged Out Successfully");
   };
 

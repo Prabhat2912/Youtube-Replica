@@ -418,6 +418,27 @@ const librarySlice = createSlice({
     clearMutError: (state) => {
       state.mutError = null;
     },
+    // Drop cached sections so the next visit refetches.
+    // Used after publishing (feed + dash go stale).
+    invalidateLibrary: (state, action) => {
+      const keys = action.payload || [];
+      if (keys.includes("feed")) state.feed = { items: [], status: "idle", error: null, updatedAt: 0 };
+      if (keys.includes("dash")) state.dash = { stats: null, uploads: [], likedCount: 0, playlistCount: 0, updatedAt: 0 };
+      if (keys.includes("tweets")) state.tweets = { latest: [], mine: [], updatedAtLatest: 0, updatedAtMine: 0 };
+      if (keys.includes("subs")) state.subs = { list: [], updatedAt: 0 };
+      if (keys.includes("liked")) state.liked = { ids: [], items: null, updatedAt: 0 };
+      if (keys.includes("playlists")) {
+        state.playlists = { list: [], updatedAt: 0 };
+        state.details = {};
+      }
+      if (keys.includes("history")) state.history = { items: [], updatedAt: 0 };
+      if (keys.includes("rooms")) state.rooms = {};
+      if (keys.includes("videos")) state.videos = {};
+      if (keys.includes("comments")) state.comments = {};
+    },
+    // Wipe the whole library on logout — never show the
+    // previous account's subs, likes, history or collections.
+    resetLibrary: () => initialState,
     patchVideoMeta: (state, action) => {
       const { id, patch } = action.payload;
       const v = state.videos[id];
@@ -654,6 +675,6 @@ const librarySlice = createSlice({
   },
 });
 
-export const { clearMutError, patchVideoMeta, dropVideo, flipPublished } = librarySlice.actions;
+export const { clearMutError, patchVideoMeta, dropVideo, flipPublished, invalidateLibrary, resetLibrary } = librarySlice.actions;
 export const selectLibrary = (state) => state.library;
 export default librarySlice.reducer;

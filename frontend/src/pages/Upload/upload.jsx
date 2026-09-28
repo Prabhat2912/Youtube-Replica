@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { FiUpload, FiImage, FiCheck, FiClock } from "react-icons/fi";
 import BASE_URL from "../../../BaseURL";
+import { invalidateLibrary } from "../../Redux/Features/Library/librarySlice";
 import { uploadToCloudinary, autoFrame } from "../../function/cloudinaryUpload";
 import { usePageMeta } from "../../function/pageMeta";
 
@@ -11,6 +13,7 @@ const stepWrap = "rounded-3xl border border-line bg-panel p-6 sm:p-7";
 
 const Upload = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   usePageMeta("New premiere", "Upload a video to PlayTube and premiere it to the network.");
 
   const [file, setFile] = useState(null);
@@ -92,6 +95,8 @@ const Upload = () => {
         { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 }
       );
       const id = res.data?.data?._id;
+      // New premiere must appear in feed + dashboard immediately.
+      dispatch(invalidateLibrary(["feed", "dash"]));
       navigate(id ? `/video/${id}` : "/dashboard", { replace: true });
     } catch (err) {
       setError(err?.response?.data?.message || "Publishing failed. Try again.");

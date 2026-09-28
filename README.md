@@ -79,14 +79,41 @@ Built by **Prabhat Kumar** while learning backend development from
 | Layer    | Tech                                                              |
 | -------- | ----------------------------------------------------------------- |
 | Frontend | React 18, Vite 8, Tailwind CSS, Redux Toolkit, React Router, GSAP |
-
-Reads go through a Redux Toolkit cache (`library` slice, ~4min TTL):
-feed, video rooms, comments, likes, subs, playlists, history, dashboard,
-tweets and channels load once and survive navigation; mutations patch the
-cache with server-count reconciliation and rollback on failure.
 | Backend  | Node.js, Express 4, MongoDB + Mongoose, JWT, bcryptjs, nodemailer |
 | Media    | Cloudinary (uploads, thumbnails, playback)                        |
 | Deploy   | Vercel (frontend static + backend serverless function)            |
+
+## Data layer (Redux caching)
+
+Every read goes through the Redux Toolkit `library` slice
+(`frontend/src/Redux/Features/Library/librarySlice.js`) with a ~4-minute
+TTL. First visit fetches, revisits reuse the cache, manual retries pass
+`{ force: true }`. Nothing refetches just because you navigated.
+
+| Cached                  | Thunks                                              | Invalidated / patched on                          |
+| ----------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| Feed                    | `fetchFeed`                                         | publish, retry                                    |
+| Video rooms             | `fetchVideo` (doc + counts + liked/follow/kept)     | like, follow, keep, comment, edit, delete         |
+| Comments                | `fetchComments`, `post/edit/remove/toggleLike`      | post, edit, delete, like (counts reconciled)      |
+| Liked                   | `fetchLiked`, `ensureLiked`, `toggleLikeVideo`      | toggle (ids + list patched, rollback on failure)  |
+| Subscriptions           | `ensureSubs`, `toggleFollow`                        | follow/unfollow (list + room counts patched)      |
+| Watch Later             | `toggleKeptVideo`                                   | toggle (rollback on failure)                      |
+| Playlists + shelves     | `ensure/create/delete/rename/fetchDetail/toggle`    | create, rename, delete, shelf add/remove          |
+| History                 | `fetchHistory`                                      | logout (wiped)                                    |
+| Dashboard               | `fetchDash` (stats + uploads + counts)              | publish, edit, delete, list/unlist                |
+| Tweets                  | `fetchTweets` (Latest + Mine tabs)                  | post, edit, delete (force refetch)                |
+| Channel rooms           | `fetchChannelRoom` (room + premieres + shouts)      | follow (force refresh)                            |
+
+Rules the slice enforces:
+
+- **Mutations patch locally first**, reconcile with server totals, and roll
+  back on failure — the UI never waits on a round trip to feel instant.
+- **Publishing** invalidates feed + dashboard so the premiere appears
+  everywhere immediately.
+- **Logout wipes the whole library** (and login resets it) — one account can
+  never see the previous account's subs, likes, history or collections.
+- One-shot flows (login, OTP, password reset, uploads to Cloudinary) call
+  the API directly — caching those would be wrong.
 
 ## Project structure
 
