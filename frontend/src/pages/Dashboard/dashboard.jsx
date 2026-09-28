@@ -77,9 +77,9 @@ const Dashboard = () => {
 
       <div className="mt-6 flex items-center justify-between">
         <h2 className="font-display text-lg font-black tracking-tight text-zinc-100">Your premieres</h2>
-        <button className="inline-flex h-10 items-center gap-2 rounded-full bg-ember px-5 text-sm font-bold text-white hover:bg-ember-bright">
+        <Link to="/upload" className="inline-flex h-10 items-center gap-2 rounded-full bg-ember px-5 text-sm font-bold text-white hover:bg-ember-bright">
           <FiUpload /> New premiere
-        </button>
+        </Link>
       </div>
       <div className="mt-4">
         {status === "loading" ? (

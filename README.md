@@ -51,6 +51,9 @@ Built by **Prabhat Kumar** while learning backend development from
 - `/profile` — real watch history (`GET /users/history`)
 - `/dashboard` — uploads + **live-counted stats** (views, applause,
   collections, premieres)
+- `/upload` — real publishing: file beams straight to Cloudinary (unsigned
+  preset, progress bar), poster via auto-frame or image upload, then metadata
+  POSTs to the API and lands on the watch page
 
 ### Backend API
 
@@ -196,7 +199,7 @@ npm run build    # production build (dist/)
 - ✅ Backend API + OTP + password reset + Vercel/CORS hardening
 - ✅ Landing, auth flows, real-data library pages, help, SEO/llms.txt
 - 🚧 Video transcoding/quality options, notifications, recommendations
-- 🚧 Direct-to-Cloudinary uploads for large files on serverless
+- 🚧 In-app upload progress for very large files (direct-to-Cloudinary already live)
 
 ## Author
 

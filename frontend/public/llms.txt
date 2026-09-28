@@ -15,6 +15,7 @@
 - Verify email: `/verify-otp` — 6-digit code, 30s resend, paste support
 - Login: `/login` — username-or-email plus password
 - Dashboard (login): `/dashboard` — channel stats and uploads
+- Upload (login): `/upload` — video file to Cloudinary, poster, publish
 - Profile (login): `/profile` — identity and watch-later library
 - Subscriptions (login): `/subscriptions` — followed channels, unfollow
 - Applauded (login): `/liked` — liked videos

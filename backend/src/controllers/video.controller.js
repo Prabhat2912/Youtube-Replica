@@ -43,55 +43,43 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
-  const { title, description, video, thumbnail } = req.body;
+  // Files go straight from the browser to Cloudinary (unsigned preset),
+  // because serverless bodies cap at ~4.5MB. The client POSTs the
+  // resulting URLs + duration here as JSON.
+  const { title, description, videoFile, thumbnail, duration } = req.body || {};
 
-  // Get paths of uploaded files
-  // const videoLocalPath =
-  //   req.files["videoFile"] && req.files["videoFile"][0]?.path;
-
-  // const thumbnailLocalPath =
-  //   req.files["thumbnail"] && req.files["thumbnail"][0]?.path;
-
-  // Check if files exist
-  if (!video) {
-    throw new ApiError(400, "No video found");
+  if (!title?.trim()) {
+    throw new ApiError(400, "Give your premiere a title.");
+  }
+  if (!videoFile) {
+    throw new ApiError(400, "Upload the video file first.");
   }
   if (!thumbnail) {
-    throw new ApiError(400, "No thumbnail found");
+    throw new ApiError(400, "Add a thumbnail (upload one or use an auto frame).");
   }
 
-  // Upload files to Cloudinary
-  // const uploadedVideo = await uploadOnCloudinary(videoLocalPath);
-  // const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+  let length = Math.floor(Number(duration) || 0);
+  if (!length) {
+    try {
+      length = Math.floor((await getVideoDurationFromCloudinary(videoFile)) || 0);
+    } catch {
+      length = 0;
+    }
+  }
 
-  // Check if upload to Cloudinary was successful
-  // if (!uploadedVideo || !uploadedThumbnail) {
-  //   throw new ApiError(
-  //     500,
-  //     "Failed to upload video or thumbnail to Cloudinary"
-  //   );
-  // }
-
-  // Calculate duration if available
-  const duration = parseInt(getVideoDurationFromCloudinary(video)) || 0;
-
-  // Create a new video document
-  const nvideo = new Video({
-    title,
-    description,
-    videoFile: video,
-    thumbnail: thumbnail,
-    duration,
+  const created = await Video.create({
+    title: title.trim(),
+    description: String(description || "").trim(),
+    videoFile,
+    thumbnail,
+    duration: length,
     owner: req.user._id,
   });
+  await created.populate("owner", "fullName username avatar");
 
-  // Save the video document to the database
-  await video.save();
-
-  // Return a success response
   return res
     .status(201)
-    .json(new ApiResponse(201, video, "Video Published Successfully"));
+    .json(new ApiResponse(201, created, "Premiere published successfully"));
 });
 
 const getVideoById = asyncHandler(async (req, res) => {

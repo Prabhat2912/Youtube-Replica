@@ -20,6 +20,7 @@ import Subscriptions from "./pages/Subscriptions/subscriptions";
 import { Liked, Library } from "./pages/Library/library";
 import Settings from "./pages/Settings/settings";
 import Help from "./pages/Help/help";
+import Upload from "./pages/Upload/upload";
 import Login from "./components/Login/Login";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -65,6 +66,7 @@ const routes = (
         path="settings"
         element={<ProtectedRoute element={<Settings />} />}
       />
+      <Route path="upload" element={<ProtectedRoute element={<Upload />} />} />
       <Route path="help" element={<Help />} />
       <Route path="search" element={<SearchView />} />
       {/* legacy alias */}

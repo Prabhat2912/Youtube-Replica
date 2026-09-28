@@ -69,7 +69,7 @@ const Header = ({ onMenuClick }) => {
         {authState.isLogin ? (
           <>
             <Link
-              to="/dashboard"
+              to="/upload"
               className="hidden h-10 items-center gap-2 rounded-full border border-line bg-panel px-4 text-sm font-semibold text-zinc-200 hover:border-zinc-600 sm:flex"
             >
               <FiUpload /> Upload
