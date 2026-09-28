@@ -32,6 +32,7 @@ import {
 } from "./Redux/Features/Auth/AuthSlice";
 import SignUp from "./components/Signup/signUp";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PwaInstallBanner from "./components/PwaInstallBanner/PwaInstallBanner";
 import { Toaster } from "sonner";
 
 const ProtectedRoute = ({ element }) => {
@@ -104,6 +105,7 @@ function App() {
     <ErrorBoundary>
       <RouterProvider router={router} />
       <Toaster position="bottom-right" />
+      <PwaInstallBanner />
     </ErrorBoundary>
   );
 }
