@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,7 +12,7 @@ import { usePageMeta } from "../../function/pageMeta";
 const Subscriptions = () => {
   const dispatch = useDispatch();
   const { list, updatedAt } = useSelector(selectLibrary).subs;
-  const [error, setError] = React.useState(null);
+  const [error, setError] = useState(null);
   const loading = !updatedAt && !error && !list.length;
   usePageMeta("Subscriptions", "Channels you follow on PlayTube.");
 
